@@ -198,7 +198,7 @@ class ChamferLoss(nn.Module):
 
         # we need only a StandardGpuResources per GPU
         self.res = faiss.StandardGpuResources()
-        self.res.setTempMemoryFraction(0.1)
+        self.res.setTempMemory(1500 * 1024 * 1024)
         self.flat_config = faiss.GpuIndexFlatConfig()
         self.flat_config.device = opt.gpu_id
 
