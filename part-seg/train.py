@@ -18,7 +18,7 @@ import numpy as np
 from models import losses
 from models.segmenter import Model
 from data.shapenet_loader import ShapeNetLoader
-from util.visualizer import Visualizer
+# from util.visualizer import Visualizer
 
 
 if __name__=='__main__':
@@ -30,7 +30,7 @@ if __name__=='__main__':
     testset = ShapeNetLoader(opt.dataroot, 'test', opt)
     testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
 
-    visualizer = Visualizer(opt)
+    # visualizer = Visualizer(opt)
 
     # create model, optionally load pre-trained model
     model = Model(opt)
@@ -62,9 +62,13 @@ if __name__=='__main__':
                 t = (time.time() - iter_start_time) / opt.batch_size
 
                 errors = model.get_current_errors()
+                
+                print(model.test_loss_segmenter.item())
+                print(errors)
+                print()
 
-                visualizer.print_current_errors(epoch, epoch_iter, errors, t)
-                visualizer.plot_current_errors(epoch, float(epoch_iter) / dataset_size, opt, errors)
+                # visualizer.print_current_errors(epoch, epoch_iter, errors, t)
+                # visualizer.plot_current_errors(epoch, float(epoch_iter) / dataset_size, opt, errors)
 
                 # print(model.autoencoder.encoder.feature)
                 # visuals = model.get_current_visuals()
