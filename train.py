@@ -68,7 +68,9 @@ if __name__=='__main__':
 
                 errors = model.get_current_errors()
                 
-                print(model.test_loss)
+                print(model.test_loss.item())
+                print(errors)
+                print()
 
                 # visualizer.print_current_errors(epoch, epoch_iter, errors, t)
                 # visualizer.plot_current_errors(epoch, float(epoch_iter) / dataset_size, opt, errors)
