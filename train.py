@@ -18,7 +18,7 @@ import numpy as np
 from models.autoencoder import Model
 from data.modelnet_shrec_loader import ModelNet_Shrec_Loader
 from data.shapenet_loader import ShapeNetLoader
-from util.visualizer import Visualizer
+# from util.visualizer import Visualizer
 
 
 if __name__=='__main__':
@@ -43,10 +43,10 @@ if __name__=='__main__':
 
     model = Model(opt)
 
-    visualizer = Visualizer(opt)
+    # visualizer = Visualizer(opt)
 
     best_loss = 99
-    for epoch in range(601):
+    for epoch in range(5):
 
         epoch_iter = 0
         for i, data in enumerate(trainloader):
@@ -67,13 +67,15 @@ if __name__=='__main__':
                 t = (time.time() - iter_start_time) / opt.batch_size
 
                 errors = model.get_current_errors()
+                
+                print(model.test_loss)
 
-                visualizer.print_current_errors(epoch, epoch_iter, errors, t)
-                visualizer.plot_current_errors(epoch, float(epoch_iter) / dataset_size, opt, errors)
+                # visualizer.print_current_errors(epoch, epoch_iter, errors, t)
+                # visualizer.plot_current_errors(epoch, float(epoch_iter) / dataset_size, opt, errors)
 
                 # print(model.autoencoder.encoder.feature)
-                visuals = model.get_current_visuals()
-                visualizer.display_current_results(visuals, epoch, i)
+                # visuals = model.get_current_visuals()
+                # visualizer.display_current_results(visuals, epoch, i)
 
         # test network
         if epoch >= 0 and epoch%1==0:
