@@ -4,7 +4,7 @@ import numpy as np
 import math
 import laspy
 
-from options import Options
+from options_seg import Options
 opt = Options().parse()  # set CUDA_VISIBLE_DEVICES before import torch
 
 import torch
@@ -93,11 +93,15 @@ if __name__=='__main__':
 
                 _, predicted_seg = torch.max(model.score_segmenter.data, dim=1, keepdim=False)
                 
-                # Predicted_seg == output? 
-                print(predicted_seg)
+                print(f"input_pc: {input_pc}")
+                
+                print(f"input_sn: {input_sn}")
+                
+                # Predicted_seg == output? --> only labels
+                print(f"predicted_seg: {predicted_seg}")
                 
                 # Ground truth 
-                print(input_seg)
+                print(f"input_seg: {input_seg}")
                 
                 # Write output to new las file
                 # Data is array with [x,y,z] arrays inside: [[x1,y1,z1], [x2,y2,z2], ..., [xn,yn,zn]]

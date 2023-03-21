@@ -116,7 +116,7 @@ def compute_iou_np_array(score, seg, label, visualizer, opt, input_pc):
     return iou_np
 
 
-def compute_iou(score, seg, label, visualizer, opt, input_pc):
+def compute_iou(score, seg, label, visualizer, input_pc, vis_flag=False):
     '''
     :param score: BxCxN tensor
     :param seg: BxN tensor
@@ -145,7 +145,6 @@ def compute_iou(score, seg, label, visualizer, opt, input_pc):
     _, seg_predicted = torch.max(score, dim=1)  # BxN
 
     iou_batch = []
-    vis_flag = False
     for i in range(score.size()[0]):
         iou_pc = []
         for part in part_label[label[i]]:
