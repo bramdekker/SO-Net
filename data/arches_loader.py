@@ -145,8 +145,10 @@ class ArchesLoader(data.Dataset):
 
     def __getitem__(self, index):
         # pointnet++ dataset
+        # Get SOM file
         file = self.dataset[index][11:]
         data = np.load(os.path.join(self.root, file + '_%dx%d.npz' % (self.rows, self.cols)))
+
         pc_np = data['pc']
         sn_np = data['sn']
         seg_np = data['part_label']

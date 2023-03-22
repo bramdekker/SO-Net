@@ -1,3 +1,43 @@
+# Custom SOM builder:
+
+# import random
+# import numbers
+# import os
+# import os.path
+# import numpy as np
+# import struct
+# import math
+# import laspy
+
+# import torch
+# import torchvision
+# import matplotlib.pyplot as plt
+# import h5py
+# import json
+
+# from util import som
+
+# def som_saver_catenary_arches(root, rows, cols, gpu_ids, output_root):
+#     som_builder = som.SOM(rows, cols, 3, gpu_ids)
+    
+#     # Prepare the point clouds as a 3xN pytorch tensor
+#     file_list = os.listdir(root)
+#     for j, f in enumerate(file_list):
+#         f_las = laspy.read(os.path.join(root, f))
+        
+#         pc_np = np.vstack((f_las.x, f_las.y, f_las.z))
+#         pc_np[np.random.choice(pc_np.shape[0], 524288, replace=False), :]
+#         pc = torch.from_numpy(pc_np).cuda()
+#         som_builder.optimize(pc)
+#         som_node_np = som_builder.node.cpu().numpy().transpose().astype(np.float32)  # node_numx3
+        
+#         npz_file = os.path.join(output_root, f[0:-4]+'.npz')
+#         np.savez(npz_file, pc=pc_np, som_node=som_node_np) # sn = surface normal
+
+# rows, cols = 8, 8
+# som_saver_catenary_arches('/content/drive/MyDrive/catenary-data', rows, cols, 0, '/content/drive/MyDrive/catenary-data/%dx%d'%(rows,cols))
+
+
 import random
 import numbers
 import os
