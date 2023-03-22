@@ -26,8 +26,8 @@
 #         f_las = laspy.read(os.path.join(root, f))
         
 #         pc_np = np.vstack((f_las.x, f_las.y, f_las.z))
-#         pc_np[np.random.choice(pc_np.shape[0], 524288, replace=False), :]
-#         pc = torch.from_numpy(pc_np).cuda()
+#         pc_sampled = pc_np[np.random.choice(pc_np.shape[0], 524288, replace=False), :]
+#         pc = torch.from_numpy(pc_sampled).cuda()
 #         som_builder.optimize(pc)
 #         som_node_np = som_builder.node.cpu().numpy().transpose().astype(np.float32)  # node_numx3
         
