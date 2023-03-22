@@ -110,9 +110,9 @@ class FarthestSampler:
         return farthest_pts
 
 
-class ShapeNetLoader(data.Dataset):
+class ArchesLoader(data.Dataset):
     def __init__(self, root, mode, opt):
-        super(ShapeNetLoader, self).__init__()
+        super(ArchesLoader, self).__init__()
         self.root = root
         self.opt = opt
         self.mode = mode

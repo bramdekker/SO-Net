@@ -73,7 +73,7 @@ if __name__=='__main__':
             if opt.dataset=='modelnet' or opt.dataset=='shrec':
                 input_pc, input_sn, input_label, input_node, input_node_knn_I = data
                 model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
-            elif opt.dataset=='shapenet':
+            elif opt.dataset=='shapenet' or opt.dataset=='catenary_arches':
                 input_pc, input_sn, input_label, input_seg, input_node, input_node_knn_I = data
                 model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
 
@@ -104,7 +104,7 @@ if __name__=='__main__':
                 if opt.dataset == 'modelnet' or opt.dataset=='shrec':
                     input_pc, input_sn, input_label, input_node, input_node_knn_I = data
                     model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
-                elif opt.dataset == 'shapenet':
+                elif opt.dataset == 'shapenet' or 'catenary_arches':
                     input_pc, input_sn, input_label, input_seg, input_node, input_node_knn_I = data
                     model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
                 model.test_model()

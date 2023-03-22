@@ -12,9 +12,9 @@ class Options():
     def initialize(self):
         self.parser.add_argument('--gpu_id', type=int, default=0, help='gpu ids: e.g. 0, 1. -1 is no GPU')
 
-        self.parser.add_argument('--dataset', type=str, default='shapenet', help='modelnet / shrec')
+        self.parser.add_argument('--dataset', type=str, default='catenary_arches', help='modelnet / shrec / shapenet')
         self.parser.add_argument('--dataroot', default='/ssd/dataset/shapenetcore_partanno_segmentation_benchmark_v0_normal//', help='path to images & laser point clouds')
-        self.parser.add_argument('--classes', type=int, default=40, help='ModelNet40 or ModelNet10')
+        self.parser.add_argument('--classes', type=int, default=14, help='ModelNet40 or ModelNet10')
         self.parser.add_argument('--name', type=str, default='train', help='name of the experiment. It decides where to store samples and models')
         self.parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints', help='models are saved here')
 
