@@ -13,8 +13,8 @@ import h5py
 import faiss
 
 
-def rotate_point_cloud_90(data):
-    """ Randomly rotate the point clouds to augument the dataset
+def rotate_point_cloud_90(data, angle):
+    """ Rotate the point clouds to augument the dataset
         rotation is per shape based along up direction
         Input:
           Nx3 array, original point clouds
@@ -23,7 +23,7 @@ def rotate_point_cloud_90(data):
     """
     rotated_data = np.zeros(data.shape, dtype=np.float32)
 
-    rotation_angle = np.random.randint(low=0, high=4) * (np.pi/2.0)
+    rotation_angle = angle * (np.pi / 180.0)
     cosval = np.cos(rotation_angle)
     sinval = np.sin(rotation_angle)
     rotation_matrix = np.array([[cosval, 0, sinval],
@@ -34,7 +34,28 @@ def rotate_point_cloud_90(data):
     return rotated_data
 
 
-def rotate_point_cloud(data):
+def rotate_point_cloud_90(data):
+    """ Randomly rotate the point clouds to augument the dataset
+        rotation is per shape based along up direction
+        Input:
+          Nx3 array, original point clouds
+        Return:
+          Nx3 array, rotated point clouds
+    """
+    rotated_data = np.zeros(data.shape, dtype=np.float32)
+
+    rotation_angle = np.random.randint(low=0, high=4) * (np.pi/2.0) # 0-3 -> 0pi (0 degrees), 0.5pi (90 degrees), 1pi (180 degrees), 1.5pi (270 degrees)
+    cosval = np.cos(rotation_angle)
+    sinval = np.sin(rotation_angle)
+    rotation_matrix = np.array([[cosval, 0, sinval],
+                                [0, 1, 0],
+                                [-sinval, 0, cosval]])
+    rotated_data = np.dot(data.reshape((-1, 3)), rotation_matrix)
+
+    return rotated_data
+
+
+def random_rotate_point_cloud(data):
     """ Randomly rotate the point clouds to augument the dataset
         rotation is per shape based along up direction
         Input:

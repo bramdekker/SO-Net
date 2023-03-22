@@ -17,10 +17,17 @@ import numpy as np
 
 from models.autoencoder import Model
 from data.modelnet_shrec_loader import ModelNet_Shrec_Loader
+from data.arches_loader import ArchesLoader
 from data.shapenet_loader import ShapeNetLoader
 # from util.visualizer import Visualizer
 
-
+# Get full dataset and then split in train- and testloader.
+# Split dataset 70 for autoencoder (11 samples), 15 supervised training segmenter (2 samples), 15 validation segmenter (2 samples).
+# Need to make sure that the data samples are non-overlapping, or can autoencoder be trained on all data?
+# Normalize data: normalized to be zero-mean inside a unit cube 0-1
+# Use augmentation (rotation, downsampling, translation) to get more data.
+# What do I want to test? Train autoencoder on a lot of data, also augmented.
+# The generated clusters should be good so that they can be labeled by a user (better to have smaller clusters, then big)
 if __name__=='__main__':
     if opt.dataset=='modelnet' or opt.dataset=='shrec':
         trainset = ModelNet_Shrec_Loader(opt.dataroot, 'train', opt)
@@ -36,8 +43,18 @@ if __name__=='__main__':
         trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
         print('#training point clouds = %d' % len(trainset))
 
-        tesetset = ShapeNetLoader(opt.dataroot, 'test', opt)
-        testloader = torch.utils.data.DataLoader(tesetset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
+        # tesetset = ShapeNetLoader(opt.dataroot, 'test', opt)
+        # testloader = torch.utils.data.DataLoader(tesetset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
+        testset = ShapeNetLoader(opt.dataroot, 'test', opt)
+        testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
+    elif opt.dataset=='catenary_arches':
+        trainset = ArchesLoader(opt.dataroot, 'train', opt)
+        dataset_size = len(trainset)
+        trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
+        print('#training point clouds = %d' % len(trainset))
+
+        testset = ArchesLoader(opt.dataroot, 'test', opt)
+        testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
     else:
         raise Exception('Dataset error.')
 

@@ -18,6 +18,7 @@ import numpy as np
 from models.autoencoder import Model
 from data.modelnet_shrec_loader import ModelNet_Shrec_Loader
 from data.shapenet_loader import ShapeNetLoader
+from data.arches_loader import ArchesLoader
 from util.visualizer import Visualizer
 
 
@@ -36,8 +37,16 @@ if __name__=='__main__':
         trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
         print('#training point clouds = %d' % len(trainset))
 
-        tesetset = ShapeNetLoader(opt.dataroot, 'test', opt)
-        testloader = torch.utils.data.DataLoader(tesetset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
+        testset = ShapeNetLoader(opt.dataroot, 'test', opt)
+        testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
+    elif opt.dataset=='catenary_arches':
+        trainset = ArchesLoader(opt.dataroot, 'train', opt)
+        dataset_size = len(trainset)
+        trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
+        print('#training point clouds = %d' % len(trainset))
+
+        testset = ArchesLoader(opt.dataroot, 'test', opt)
+        testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
     else:
         raise Exception('Dataset error.')
 
@@ -46,7 +55,7 @@ if __name__=='__main__':
     visualizer = Visualizer(opt)
 
     best_loss = 99
-    for epoch in range(601):
+    for epoch in range(601): # 600 epochs?!
 
         epoch_iter = 0
         for i, data in enumerate(trainloader):

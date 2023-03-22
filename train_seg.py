@@ -19,7 +19,7 @@ import numpy as np
 from models import losses
 from models.segmenter import Model
 from data.shapenet_loader import ShapeNetLoader
-# from util.visualizer import Visualizer
+from util.visualizer import Visualizer
 
 
 if __name__=='__main__':
@@ -31,7 +31,7 @@ if __name__=='__main__':
     testset = ShapeNetLoader(opt.dataroot, 'test', opt)
     testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
 
-    # visualizer = Visualizer(opt)
+    visualizer = Visualizer(opt)
 
     # create model, optionally load pre-trained model
     model = Model(opt)
@@ -95,6 +95,7 @@ if __name__=='__main__':
                 
                 print(f"input_pc: {input_pc}")
                 
+                
                 print(f"input_sn: {input_sn}")
                 
                 # Predicted_seg == output? --> only labels
@@ -106,28 +107,27 @@ if __name__=='__main__':
                 # Write output to new las file
                 # Data is array with [x,y,z] arrays inside: [[x1,y1,z1], [x2,y2,z2], ..., [xn,yn,zn]]
 		# my_data = np.hstack((my_data_xx.reshape((-1, 1)), my_data_yy.reshape((-1, 1)), my_data_zz.reshape((-1, 1))))
-
+                my_data = input_pc.numpy()[0]
 		# 1. Create a new header
-		#header = laspy.LasHeader(point_format=3, version="1.2")
+                header = laspy.LasHeader(point_format=6, version="1.4")
 		#header.offsets = np.min(my_data, axis=0)
 
 		# 2. Create a Las
-		#class_labels = np.hstack((np.zeros((110,), dtype=int), np.ones((115,), dtype=int)))
-		#las = laspy.LasData(header)
+                las = laspy.LasData(header)
 
-		#las.x = my_data[:, 0] # Array with all x coefficients. [x1, x2, ..., xn]
-		#las.y = my_data[:, 1]
-		#las.z = my_data[:, 2]
-		#las.classification = class_labels # Set labels of every point.
+                las.x = my_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+                las.y = my_data[1]
+                las.z = my_data[2]
+                las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
 
-		#las.write("train_seg.las")
-                
+                las.write("train_seg.las")
+                break
                 #correct_mask = torch.eq(predicted_seg, model.input_seg).float()
                 #test_accuracy_segmenter = torch.mean(correct_mask)
                 #model.test_accuracy_segmenter += test_accuracy_segmenter * input_label.size()[0]
 
                 # segmentation iou
-                test_iou_batch = losses.compute_iou(model.score_segmenter.cpu().data, model.input_seg.cpu().data, model.input_label.cpu().data, visualizer, opt, input_pc.cpu().data)
+                test_iou_batch = losses.compute_iou(model.score_segmenter.cpu().data, model.input_seg.cpu().data, model.input_label.cpu().data, visualizer, input_pc.cpu().data)
                 model.test_iou += test_iou_batch * input_label.size()[0]
 
                 # print(test_iou_batch)
