@@ -16,26 +16,26 @@ class Options():
         self.parser.add_argument('--dataroot', default='/ssd/dataset/shapenetcore_partanno_segmentation_benchmark_v0_normal//', help='path to images & laser point clouds')
         self.parser.add_argument('--classes', type=int, default=14, help='ModelNet40 or ModelNet10')
         self.parser.add_argument('--name', type=str, default='train', help='name of the experiment. It decides where to store samples and models')
-        self.parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints', help='models are saved here')
+        self.parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints_catenary', help='models are saved here')
 
-        self.parser.add_argument('--batch_size', type=int, default=8, help='input batch size')
-        self.parser.add_argument('--input_pc_num', type=int, default=1024, help='# of input points')
-        self.parser.add_argument('--surface_normal', type=bool, default=True, help='use surface normal in the pc input')
+        self.parser.add_argument('--batch_size', type=int, default=2, help='input batch size')
+        self.parser.add_argument('--input_pc_num', type=int, default=131072, help='# of input points')
+        self.parser.add_argument('--surface_normal', type=bool, default=False, help='use surface normal in the pc input')
         self.parser.add_argument('--nThreads', default=8, type=int, help='# threads for loading data')
 
         self.parser.add_argument('--display_winsize', type=int, default=256, help='display window size')
         self.parser.add_argument('--display_id', type=int, default=200, help='window id of the web display')
 
-        self.parser.add_argument('--output_pc_num', type=int, default=1280, help='# of output points')
-        self.parser.add_argument('--output_fc_pc_num', type=int, default=256, help='# of fc decoder output points')
-        self.parser.add_argument('--output_conv_pc_num', type=int, default=1024, help='# of conv decoder output points')
+        self.parser.add_argument('--output_pc_num', type=int, default=4608, help='# of output points')
+        self.parser.add_argument('--output_fc_pc_num', type=int, default=512, help='# of fc decoder output points')
+        self.parser.add_argument('--output_conv_pc_num', type=int, default=4096, help='# of conv decoder output points')
 
-        self.parser.add_argument('--feature_num', type=int, default=1024, help='length of encoded feature')
+        self.parser.add_argument('--feature_num', type=int, default=4096, help='length of encoded feature')
         self.parser.add_argument('--activation', type=str, default='relu', help='activation function: relu, elu')
         self.parser.add_argument('--normalization', type=str, default='batch', help='normalization function: batch, instance')
 
         self.parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
-        self.parser.add_argument('--dropout', type=float, default=0.5, help='learning rate')
+        self.parser.add_argument('--dropout', type=float, default=0.5, help='dropout rate')
         self.parser.add_argument('--node_num', type=int, default=64, help='som node number')
         self.parser.add_argument('--k', type=int, default=3, help='knn search')
 

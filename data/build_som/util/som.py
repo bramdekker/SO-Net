@@ -23,6 +23,9 @@
 #     # Prepare the point clouds as a 3xN pytorch tensor
 #     file_list = os.listdir(root)
 #     for j, f in enumerate(file_list):
+#         if os.path.isdir(os.path.join(root, f)):
+#             continue
+
 #         f_las = laspy.read(os.path.join(root, f))
         
 #         pc_np = np.vstack((f_las.x, f_las.y, f_las.z))

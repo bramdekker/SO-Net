@@ -122,6 +122,12 @@ class ArchesLoader(data.Dataset):
         self.rows = round(math.sqrt(self.node_num))
         self.cols = self.rows
 
+        self.rotations = [-45, 0, 45]
+
+        # Add random noise: what value to base it on? Normalized data, biggest max-min difference?
+
+        # Normalize? Need max and min of x, y and z
+
         # self.dataset = make_dataset_shapenet_normal(self.root, self.mode) # list of file names
         self.dataset = make_dataset_arches(self.root, self.mode) # list of file names
         # ensure there is no batch-1 batch
@@ -140,14 +146,16 @@ class ArchesLoader(data.Dataset):
         # farthest point sample
         self.fathest_sampler = FarthestSampler()
 
+    # Add augmentation entries here as well. 
     def __len__(self):
-        return len(self.dataset)
+        return 2 * len(self.rotations) * len(self.dataset)
 
     def __getitem__(self, index):
         # pointnet++ dataset
         # Get SOM file
-        file = self.dataset[index][11:]
-        data = np.load(os.path.join(self.root, file + '_%dx%d.npz' % (self.rows, self.cols)))
+        dataset_idx = index % 6
+        file = self.dataset[dataset_idx][0:-4]
+        data = np.load(os.path.join(self.root, '%d_%d' % (self.rows, self.cols), file + '.npz'))
 
         pc_np = data['pc']
         sn_np = data['sn']
@@ -157,6 +165,7 @@ class ArchesLoader(data.Dataset):
         # label = self.folders.index(file[0:8])
         # assert(label >= 0)
 
+        # Downsample to the number of input points specified in options.
         if self.opt.input_pc_num < pc_np.shape[0]:
             chosen_idx = np.random.choice(pc_np.shape[0], self.opt.input_pc_num, replace=False)
             pc_np = pc_np[chosen_idx, :]
@@ -173,6 +182,19 @@ class ArchesLoader(data.Dataset):
 
         # augmentation
         if self.mode == 'train':
+            # index 1-6: 1-3 without noise, 4-6 with noise
+            if dataset_idx >= 3:
+                pc_np = random_noise(pc_np, -1, 1)
+                som_node_np = random_noise(som_node_np, -1, 1)
+
+            # 0, 3 = -45
+            # 1, 4 = 0
+            # 2, 5 = 45
+            rotation_angle = self.rotations[dataset_idx % len(self.rotations)]
+            if rotation_angle != 0:
+                pc_np = rotate_point_cloud(pc_np, rotation_angle)
+                som_node_np = rotate_point_cloud(som_node_np, rotation_angle)
+
             # rotate by random degree over model z (point coordinate y) axis
             # pc_np = rotate_point_cloud(pc_np)
             # som_node_np = rotate_point_cloud(som_node_np)
@@ -182,14 +204,14 @@ class ArchesLoader(data.Dataset):
             # som_node_np = rotate_point_cloud_90(som_node_np)
 
             # random jittering
-            pc_np = jitter_point_cloud(pc_np)
-            sn_np = jitter_point_cloud(sn_np)
-            som_node_np = jitter_point_cloud(som_node_np, sigma=0.04, clip=0.1)
+            # pc_np = jitter_point_cloud(pc_np)
+            # sn_np = jitter_point_cloud(sn_np)
+            # som_node_np = jitter_point_cloud(som_node_np, sigma=0.04, clip=0.1)
 
             # random scale
-            scale = np.random.uniform(low=0.8, high=1.2)
+            scale = np.random.uniform(low=0.9, high=1.1)
             pc_np = pc_np * scale
-            sn_np = sn_np * scale
+            # sn_np = sn_np * scale
             som_node_np = som_node_np * scale
 
             # random shift

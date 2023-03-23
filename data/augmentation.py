@@ -13,11 +13,37 @@ import h5py
 import faiss
 
 
-def rotate_point_cloud_90(data, angle):
+def random_noise(data, min, max):
+    """ Add random noise to each point in the point cloud to augument the dataset
+        Input:
+          Nx3 array, original point clouds + min and max noise value
+        Return:
+          Nx3 array, rotated point clouds
+    """
+    # rand returns floating-point samples from the uniform distribution.
+    random_nums = np.random.rand(data.shape[0], data.shape[1]) * (max - min) 
+    noise = random_nums + min
+    return data + noise
+
+
+def random_gaussian_noise(data, mean, std):
+    """ Add random Gaussian noise to each point in the point cloud to augument the dataset
+        Input:
+          Nx3 array, original point clouds + mean and std of noise
+        Return:
+          Nx3 array, rotated point clouds
+    """
+    # noise = np.random.normal(mean, std, len(data))
+    # randn returns floating-point samples from the Gaussian distribution.
+    noise = np.clip(std * np.random.randn(data.shape[0], data.shape[1]) + mean, -0.05, 0.05)
+    return data + noise
+
+
+def rotate_point_cloud(data, angle):
     """ Rotate the point clouds to augument the dataset
         rotation is per shape based along up direction
         Input:
-          Nx3 array, original point clouds
+          Nx3 array, original point clouds + angle to rotate over in degrees
         Return:
           Nx3 array, rotated point clouds
     """
