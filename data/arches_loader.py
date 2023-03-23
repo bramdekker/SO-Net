@@ -158,8 +158,8 @@ class ArchesLoader(data.Dataset):
         data = np.load(os.path.join(self.root, '%dx%d' % (self.rows, self.cols), file + '.npz'))
 
         pc_np = data['pc']
-        sn_np = data['sn']
-        seg_np = data['part_label']
+        # sn_np = data['sn']
+        # seg_np = data['part_label']
         som_node_np = data['som_node']
         label = 1 # dummy value, always 1
         # label = self.folders.index(file[0:8])
@@ -169,16 +169,16 @@ class ArchesLoader(data.Dataset):
         if self.opt.input_pc_num < pc_np.shape[0]:
             chosen_idx = np.random.choice(pc_np.shape[0], self.opt.input_pc_num, replace=False)
             pc_np = pc_np[chosen_idx, :]
-            sn_np = sn_np[chosen_idx, :]
-            seg_np = seg_np[chosen_idx]
+            # sn_np = sn_np[chosen_idx, :]
+            # seg_np = seg_np[chosen_idx]
         else:
             chosen_idx = np.random.choice(pc_np.shape[0], self.opt.input_pc_num-pc_np.shape[0], replace=True)
             pc_np_redundent = pc_np[chosen_idx, :]
-            sn_np_redundent = sn_np[chosen_idx, :]
-            seg_np_redundent = seg_np[chosen_idx]
+            # sn_np_redundent = sn_np[chosen_idx, :]
+            # seg_np_redundent = seg_np[chosen_idx]
             pc_np = np.concatenate((pc_np, pc_np_redundent), axis=0)
-            sn_np = np.concatenate((sn_np, sn_np_redundent), axis=0)
-            seg_np = np.concatenate((seg_np, seg_np_redundent), axis=0)
+            # sn_np = np.concatenate((sn_np, sn_np_redundent), axis=0)
+            # seg_np = np.concatenate((seg_np, seg_np_redundent), axis=0)
 
         # augmentation
         if self.mode == 'train':
@@ -221,8 +221,8 @@ class ArchesLoader(data.Dataset):
 
         # convert to tensor
         pc = torch.from_numpy(pc_np.transpose().astype(np.float32))  # 3xN
-        sn = torch.from_numpy(sn_np.transpose().astype(np.float32))  # 3xN
-        seg = torch.from_numpy(seg_np.astype(np.int64))  # N
+        # sn = torch.from_numpy(sn_np.transpose().astype(np.float32))  # 3xN
+        # seg = torch.from_numpy(seg_np.astype(np.int64))  # N
 
         # som
         som_node = torch.from_numpy(som_node_np.transpose().astype(np.float32))  # 3xnode_num
@@ -235,7 +235,7 @@ class ArchesLoader(data.Dataset):
             som_knn_I = torch.from_numpy(np.arange(start=0, stop=self.opt.node_num, dtype=np.int64).reshape(
                 (self.opt.node_num, 1)))  # node_num x 1
 
-        return pc, sn, label, seg, som_node, som_knn_I
+        return pc, label, som_node, som_knn_I
 
 
 
