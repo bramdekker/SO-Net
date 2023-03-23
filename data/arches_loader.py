@@ -158,8 +158,11 @@ class ArchesLoader(data.Dataset):
         print(f"Just before np load of npz file {file}")
         data = np.load(os.path.join(self.root, '%dx%d' % (self.rows, self.cols), file + '.npz'))
 
-        # Data is like [[x1, y1, z1], [x2, y2, z2], ..., [xn, yn, zn]], so actually Nx3 array
-        pc_np = np.transpose(data['pc'])
+        # Data is like [[x1, y1, z1], [x2, y2, z2], ..., [xn, yn, zn]], so a Nx3 array
+        # pc_np = np.transpose(data['pc'])
+
+        # Data is like [[x1, x2, ..., xn], [y1, y2, ..., yn], [z1, z2, ..., zn]], so a 3xN array
+        pc_np = data['pc']
         # sn_np = data['sn']
         # seg_np = data['part_label']
         som_node_np = data['som_node']
@@ -169,18 +172,18 @@ class ArchesLoader(data.Dataset):
 
         print("Just before downsampling")
         # Downsample to the number of input points specified in options.
-        if self.opt.input_pc_num < pc_np.shape[0]:
+        if self.opt.input_pc_num < pc_np.shape[1]:
             print(f"pc_np.shape: {pc_np.shape}")
-            print(f"pc_np.shape[0]: {pc_np.shape[0]}")
-            chosen_idx = np.random.choice(pc_np.shape[0], self.opt.input_pc_num, replace=False)
-            pc_np = pc_np[chosen_idx, :]
+            print(f"pc_np.shape[0]: {pc_np.shape[1]}")
+            chosen_idx = np.random.choice(pc_np.shape[1], self.opt.input_pc_num, replace=False)
+            pc_np = pc_np[:, chosen_idx]
             # sn_np = sn_np[chosen_idx, :]
             # seg_np = seg_np[chosen_idx]
         else:
             print(f"In else: pc_np.shape: {pc_np.shape}")
-            print(f"In else: pc_np.shape[0]: {pc_np.shape[0]}")
-            chosen_idx = np.random.choice(pc_np.shape[0], self.opt.input_pc_num-pc_np.shape[0], replace=True)
-            pc_np_redundent = pc_np[chosen_idx, :]
+            print(f"In else: pc_np.shape[0]: {pc_np.shape[1]}")
+            chosen_idx = np.random.choice(pc_np.shape[1], self.opt.input_pc_num-pc_np.shape[1], replace=True)
+            pc_np_redundent = pc_np[:, chosen_idx]
             # sn_np_redundent = sn_np[chosen_idx, :]
             # seg_np_redundent = seg_np[chosen_idx]
             pc_np = np.concatenate((pc_np, pc_np_redundent), axis=0)
