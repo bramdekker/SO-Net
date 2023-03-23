@@ -21,7 +21,7 @@ class Options():
         self.parser.add_argument('--batch_size', type=int, default=2, help='input batch size')
         self.parser.add_argument('--input_pc_num', type=int, default=131072, help='# of input points')
         self.parser.add_argument('--surface_normal', type=bool, default=False, help='use surface normal in the pc input')
-        self.parser.add_argument('--nThreads', default=8, type=int, help='# threads for loading data')
+        self.parser.add_argument('--nThreads', default=1, type=int, help='# threads for loading data')
 
         self.parser.add_argument('--display_winsize', type=int, default=256, help='display window size')
         self.parser.add_argument('--display_id', type=int, default=200, help='window id of the web display')

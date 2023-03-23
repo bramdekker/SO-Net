@@ -79,7 +79,7 @@ if __name__=='__main__':
 
             model.optimize()
 
-            if i % 100 == 0:
+            if i % 10 == 0:
                 # print/plot errors
                 t = (time.time() - iter_start_time) / opt.batch_size
 
