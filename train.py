@@ -55,7 +55,7 @@ if __name__=='__main__':
 
         testset = ArchesLoader(opt.dataroot, 'test', opt)
         testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
-        print('#test point clouds = %d' % len(testset))
+        # print('#test point clouds = %d' % len(testset))
     else:
         raise Exception('Dataset error.')
 
@@ -63,10 +63,10 @@ if __name__=='__main__':
 
     # visualizer = Visualizer(opt)
 
-    print('About to start training loop')
+    # print('About to start training loop')
 
     best_loss = 99
-    for epoch in range(5):
+    for epoch in range(50):
 
         epoch_iter = 0
         for i, data in enumerate(trainloader):
@@ -74,19 +74,19 @@ if __name__=='__main__':
             epoch_iter += opt.batch_size
 
             # data contains multiple point clouds!
-            print(f"Data length (==batchsize=4): {len(data)}")
+            # print(f"Data length (==batchsize=4): {len(data)}")
 
             if opt.dataset=='modelnet' or opt.dataset=='shrec':
                 input_pc, input_sn, input_label, input_node, input_node_knn_I = data
                 model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
             elif opt.dataset=='shapenet' or opt.dataset=='catenary_arches':
-                print('Going to unpack the data of a single batch')
+                # print('Going to unpack the data of a single batch')
                 input_pc, input_label, input_node, input_node_knn_I = data # pc, label, som_node, som_knn_I
                 model.set_input(input_pc, input_label, input_node, input_node_knn_I)
 
-            print('About to optimize the model based on current training batch')
+            # print('About to optimize the model based on current training batch')
             model.optimize()
-            print('After optimizing the model based on current training batch')
+            # print('After optimizing the model based on current training batch')
 
             if i % 10 == 0:
                 # print/plot errors
