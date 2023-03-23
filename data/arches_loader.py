@@ -166,6 +166,7 @@ class ArchesLoader(data.Dataset):
         # sn_np = data['sn']
         # seg_np = data['part_label']
         som_node_np = data['som_node']
+        print(f"som_node_np.shape: {som_node_np.shape}")
         label = 1 # dummy value, always 1
         # label = self.folders.index(file[0:8])
         # assert(label >= 0)
@@ -191,6 +192,7 @@ class ArchesLoader(data.Dataset):
             # seg_np = np.concatenate((seg_np, seg_np_redundent), axis=0)
 
         print("Just after downsampling")
+        # TODO: check augmentation methods. One of them returns Nx3 data instead of 3xN!
         # augmentation
         if self.mode == 'train':
             # index 1-6: 1-3 without noise, 4-6 with noise

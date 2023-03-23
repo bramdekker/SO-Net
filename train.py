@@ -73,6 +73,9 @@ if __name__=='__main__':
             iter_start_time = time.time()
             epoch_iter += opt.batch_size
 
+            # data contains multiple point clouds!
+            print(f"Data shape: {data.shape}")
+
             if opt.dataset=='modelnet' or opt.dataset=='shrec':
                 input_pc, input_sn, input_label, input_node, input_node_knn_I = data
                 model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
