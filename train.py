@@ -55,12 +55,15 @@ if __name__=='__main__':
 
         testset = ArchesLoader(opt.dataroot, 'test', opt)
         testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
+        print('#test point clouds = %d' % len(testset))
     else:
         raise Exception('Dataset error.')
 
     model = Model(opt)
 
     # visualizer = Visualizer(opt)
+
+    print('About to start training loop')
 
     best_loss = 99
     for epoch in range(5):
@@ -74,10 +77,13 @@ if __name__=='__main__':
                 input_pc, input_sn, input_label, input_node, input_node_knn_I = data
                 model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
             elif opt.dataset=='shapenet' or opt.dataset=='catenary_arches':
+                print('Going to unpack the data of a single batch')
                 input_pc, input_label, input_node, input_node_knn_I = data # pc, label, som_node, som_knn_I
                 model.set_input(input_pc, input_label, input_node, input_node_knn_I)
 
+            print('About to optimize the model based on current training batch')
             model.optimize()
+            print('After optimizing the model based on current training batch')
 
             if i % 10 == 0:
                 # print/plot errors
