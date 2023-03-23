@@ -55,7 +55,7 @@ def rotate_point_cloud(data, angle):
     rotation_matrix = np.array([[cosval, 0, sinval],
                                 [0, 1, 0],
                                 [-sinval, 0, cosval]])
-    rotated_data = np.dot(data.reshape((3, -1)), rotation_matrix)
+    rotated_data = np.dot(data.reshape((-1, 3)), rotation_matrix)
 
     return rotated_data
 

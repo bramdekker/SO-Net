@@ -66,6 +66,7 @@ class KNNBuilder:
         :param database: numpy array of Nx3
         :return: Faiss index, in CPU
         '''
+        print(database.shape)
         index = faiss.IndexFlatL2(self.dimension)  # dimension is 3
         index.add(database)
         return index
@@ -159,14 +160,13 @@ class ArchesLoader(data.Dataset):
         data = np.load(os.path.join(self.root, '%dx%d' % (self.rows, self.cols), file + '.npz'))
 
         # Data is like [[x1, y1, z1], [x2, y2, z2], ..., [xn, yn, zn]], so a Nx3 array
-        # pc_np = np.transpose(data['pc'])
+        pc_np = np.transpose(data['pc'])
 
         # Data is like [[x1, x2, ..., xn], [y1, y2, ..., yn], [z1, z2, ..., zn]], so a 3xN array
         pc_np = data['pc']
         # sn_np = data['sn']
         # seg_np = data['part_label']
         som_node_np = data['som_node']
-        print(f"som_node_np.shape: {som_node_np.shape}")
         label = 1 # dummy value, always 1
         # label = self.folders.index(file[0:8])
         # assert(label >= 0)
