@@ -66,7 +66,6 @@ class KNNBuilder:
         :param database: numpy array of Nx3
         :return: Faiss index, in CPU
         '''
-        print(database.shape)
         index = faiss.IndexFlatL2(self.dimension)  # dimension is 3
         index.add(database)
         return index
