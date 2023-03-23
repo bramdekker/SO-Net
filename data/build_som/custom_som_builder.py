@@ -19,7 +19,8 @@ def som_saver_catenary_arches(root, rows, cols, gpu_ids, output_root):
         
         pc_np = np.vstack((f_las.x, f_las.y, f_las.z))
         pc_np = np.transpose(pc_np)
-        pc_sampled = pc_np[:, np.random.choice(pc_np.shape[0], 524288, replace=False)] # sample_size x 3
+        print(f"Shape is: {pc_np.shape}")
+        pc_sampled = pc_np[np.random.choice(pc_np.shape[0], 524288, replace=False), :] # sample_size x 3
         pc = torch.from_numpy(pc_sampled).cuda()
         som_builder.optimize(pc)
         som_node_np = som_builder.node.cpu().numpy().transpose().astype(np.float32)  # node_num x 3
