@@ -120,7 +120,7 @@ if __name__=='__main__':
                 las.z = my_data[2]
                 las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
 
-                las.write("train_seg.las")
+                las.write("train_seg_catenary.las")
                 break
                 #correct_mask = torch.eq(predicted_seg, model.input_seg).float()
                 #test_accuracy_segmenter = torch.mean(correct_mask)

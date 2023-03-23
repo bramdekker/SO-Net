@@ -155,7 +155,7 @@ class ArchesLoader(data.Dataset):
         # Get SOM file
         dataset_idx = index % 6
         file = self.dataset[dataset_idx][0:-4]
-        data = np.load(os.path.join(self.root, '%d_%d' % (self.rows, self.cols), file + '.npz'))
+        data = np.load(os.path.join(self.root, '%dx%d' % (self.rows, self.cols), file + '.npz'))
 
         pc_np = data['pc']
         sn_np = data['sn']
