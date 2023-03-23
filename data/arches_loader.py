@@ -155,9 +155,11 @@ class ArchesLoader(data.Dataset):
         # Get SOM file
         dataset_idx = index % 6
         file = self.dataset[dataset_idx][0:-4]
+        print(f"Just before np load of npz file {file}")
         data = np.load(os.path.join(self.root, '%dx%d' % (self.rows, self.cols), file + '.npz'))
 
-        pc_np = data['pc']
+        # Data is like [[x1, y1, z1], [x2, y2, z2], ..., [xn, yn, zn]], so actually Nx3 array
+        pc_np = np.transpose(data['pc'])
         # sn_np = data['sn']
         # seg_np = data['part_label']
         som_node_np = data['som_node']
@@ -165,13 +167,18 @@ class ArchesLoader(data.Dataset):
         # label = self.folders.index(file[0:8])
         # assert(label >= 0)
 
+        print("Just before downsampling")
         # Downsample to the number of input points specified in options.
         if self.opt.input_pc_num < pc_np.shape[0]:
+            print(f"pc_np.shape: {pc_np.shape}")
+            print(f"pc_np.shape[0]: {pc_np.shape[0]}")
             chosen_idx = np.random.choice(pc_np.shape[0], self.opt.input_pc_num, replace=False)
             pc_np = pc_np[chosen_idx, :]
             # sn_np = sn_np[chosen_idx, :]
             # seg_np = seg_np[chosen_idx]
         else:
+            print(f"In else: pc_np.shape: {pc_np.shape}")
+            print(f"In else: pc_np.shape[0]: {pc_np.shape[0]}")
             chosen_idx = np.random.choice(pc_np.shape[0], self.opt.input_pc_num-pc_np.shape[0], replace=True)
             pc_np_redundent = pc_np[chosen_idx, :]
             # sn_np_redundent = sn_np[chosen_idx, :]
@@ -180,20 +187,25 @@ class ArchesLoader(data.Dataset):
             # sn_np = np.concatenate((sn_np, sn_np_redundent), axis=0)
             # seg_np = np.concatenate((seg_np, seg_np_redundent), axis=0)
 
+        print("Just after downsampling")
         # augmentation
         if self.mode == 'train':
             # index 1-6: 1-3 without noise, 4-6 with noise
             if dataset_idx >= 3:
+                print("Adding random noise")
                 pc_np = random_noise(pc_np, -1, 1)
                 som_node_np = random_noise(som_node_np, -1, 1)
+                print("After adding random noise")
 
             # 0, 3 = -45
             # 1, 4 = 0
             # 2, 5 = 45
             rotation_angle = self.rotations[dataset_idx % len(self.rotations)]
             if rotation_angle != 0:
+                print("Rotating point cloud")
                 pc_np = rotate_point_cloud(pc_np, rotation_angle)
                 som_node_np = rotate_point_cloud(som_node_np, rotation_angle)
+                print("After rotating point cloud")
 
             # rotate by random degree over model z (point coordinate y) axis
             # pc_np = rotate_point_cloud(pc_np)
@@ -208,11 +220,13 @@ class ArchesLoader(data.Dataset):
             # sn_np = jitter_point_cloud(sn_np)
             # som_node_np = jitter_point_cloud(som_node_np, sigma=0.04, clip=0.1)
 
+            print("Scaling point cloud")
             # random scale
             scale = np.random.uniform(low=0.9, high=1.1)
             pc_np = pc_np * scale
             # sn_np = sn_np * scale
             som_node_np = som_node_np * scale
+            print("After scaling point cloud")
 
             # random shift
             # shift = np.random.uniform(-0.1, 0.1, (1,3))
@@ -226,6 +240,7 @@ class ArchesLoader(data.Dataset):
 
         # som
         som_node = torch.from_numpy(som_node_np.transpose().astype(np.float32))  # 3xnode_num
+        print("Tranferred tensors to gpu")
 
         # kNN search: som -> som
         if self.opt.som_k >= 2:
@@ -234,6 +249,7 @@ class ArchesLoader(data.Dataset):
         else:
             som_knn_I = torch.from_numpy(np.arange(start=0, stop=self.opt.node_num, dtype=np.int64).reshape(
                 (self.opt.node_num, 1)))  # node_num x 1
+        print("Just before returning")
 
         return pc, label, som_node, som_knn_I
 

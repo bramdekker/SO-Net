@@ -50,14 +50,14 @@ class Model():
             self.test_loss = self.test_loss.to(self.opt.device)
 
     def set_input(self, input_pc, input_label, input_node, input_node_knn_I):
-        input_sn = np.ones(input_pc.shape) # Set dummy surface normals of 1
+        input_sn = torch.from_numpy(np.ones(input_pc.shape)) # Set dummy surface normals of 1
         self.input_pc.resize_(input_pc.size()).copy_(input_pc)
         self.input_sn.resize_(input_sn.size()).copy_(input_sn)
         self.input_label.resize_(input_label.size()).copy_(input_label)
         self.input_node.resize_(input_node.size()).copy_(input_node)
         self.input_node_knn_I.resize_(input_node_knn_I.size()).copy_(input_node_knn_I)
         self.pc = self.input_pc.detach()
-        # self.sn = self.input_sn.detach()
+        self.sn = self.input_sn.detach()
         self.label = self.input_label.detach()
 
     def forward(self, is_train=False, epoch=None):
