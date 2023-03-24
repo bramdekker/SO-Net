@@ -160,36 +160,39 @@ class ArchesLoader(data.Dataset):
         data = np.load(os.path.join(self.root, '%dx%d' % (self.rows, self.cols), file + '.npz'))
 
         # Data is like [[x1, y1, z1], [x2, y2, z2], ..., [xn, yn, zn]], so a Nx3 array
-        pc_np = np.transpose(data['pc'])
+        # pc_np = np.transpose(data['pc'])
 
         # Data is like [[x1, x2, ..., xn], [y1, y2, ..., yn], [z1, z2, ..., zn]], so a 3xN array
-        # pc_np = data['pc']
+        pc_np = data['pc']
+
         # sn_np = data['sn']
         # seg_np = data['part_label']
-        som_node_np = data['som_node']
+        som_node_np = np.transpose(data['som_node'])
         label = 1 # dummy value, always 1
         # label = self.folders.index(file[0:8])
         # assert(label >= 0)
 
         # print("Just before downsampling")
         # Downsample to the number of input points specified in options.
-        if self.opt.input_pc_num < pc_np.shape[0]:
+        if self.opt.input_pc_num < pc_np.shape[1]:
             # print(f"pc_np.shape: {pc_np.shape}")
-            chosen_idx = np.random.choice(pc_np.shape[0], self.opt.input_pc_num, replace=False)
-            pc_np = pc_np[chosen_idx, :]
-            # pc_np = pc_np[:, chosen_idx]
+            chosen_idx = np.random.choice(pc_np.shape[1], self.opt.input_pc_num, replace=False)
+            # pc_np = pc_np[chosen_idx, :]
+            pc_np = pc_np[:, chosen_idx]
             # sn_np = sn_np[chosen_idx, :]
             # seg_np = seg_np[chosen_idx]
         else:
             # print(f"In else: pc_np.shape: {pc_np.shape}")
-            chosen_idx = np.random.choice(pc_np.shape[0], self.opt.input_pc_num-pc_np.shape[0], replace=True)
-            pc_np_redundent = pc_np[chosen_idx, :]
-            # pc_np_redundent = pc_np[:, chosen_idx]
+            chosen_idx = np.random.choice(pc_np.shape[1], self.opt.input_pc_num-pc_np.shape[1], replace=True)
+            # pc_np_redundent = pc_np[chosen_idx, :]
+            pc_np_redundent = pc_np[:, chosen_idx]
             # sn_np_redundent = sn_np[chosen_idx, :]
             # seg_np_redundent = seg_np[chosen_idx]
-            pc_np = np.concatenate((pc_np, pc_np_redundent), axis=0)
+            pc_np = np.concatenate((pc_np, pc_np_redundent), axis=0) # Ux3 concat Vx3 -> Nx3
             # sn_np = np.concatenate((sn_np, sn_np_redundent), axis=0)
             # seg_np = np.concatenate((seg_np, seg_np_redundent), axis=0)
+
+        print(f"Shape just before augmentation is {pc_np.shape}")
 
         # print("Just after downsampling")
         # TODO: check augmentation methods. One of them returns Nx3 data instead of 3xN!
@@ -202,6 +205,9 @@ class ArchesLoader(data.Dataset):
                 som_node_np = random_noise(som_node_np, -1, 1)
                 # print("After adding random noise")
                 # print(f"pc_np.shape: {pc_np.shape}")
+            
+            print(f"Shape after random noise is {pc_np.shape}")
+
 
             # 0, 3 = -45
             # 1, 4 = 0
@@ -212,6 +218,8 @@ class ArchesLoader(data.Dataset):
                 pc_np = rotate_point_cloud(pc_np, rotation_angle)
                 som_node_np = rotate_point_cloud(som_node_np, rotation_angle)
                 # print("After rotating point cloud")
+
+            print(f"Shape after rotation is {pc_np.shape}")
 
             # rotate by random degree over model z (point coordinate y) axis
             # pc_np = rotate_point_cloud(pc_np)
@@ -240,12 +248,12 @@ class ArchesLoader(data.Dataset):
             # som_node_np += shift
 
         # convert to tensor
-        pc = torch.from_numpy(pc_np.transpose().astype(np.float32))  # 3xN
+        pc = torch.from_numpy(pc_np.astype(np.float32))  # 3xN
         # sn = torch.from_numpy(sn_np.transpose().astype(np.float32))  # 3xN
         # seg = torch.from_numpy(seg_np.astype(np.int64))  # N
 
         # som
-        som_node = torch.from_numpy(som_node_np.transpose().astype(np.float32))  # 3xnode_num
+        som_node = torch.from_numpy(som_node_np.astype(np.float32))  # 3xnode_num
         # print("Tranferred tensors to gpu")
 
         # kNN search: som -> som
@@ -256,6 +264,8 @@ class ArchesLoader(data.Dataset):
             som_knn_I = torch.from_numpy(np.arange(start=0, stop=self.opt.node_num, dtype=np.int64).reshape(
                 (self.opt.node_num, 1)))  # node_num x 1
         # print("Just before returning")
+
+        print(f"Final shape of pc is {pc.shape}. Index is {dataset_idx}")
 
         return pc, label, som_node, som_knn_I
 
