@@ -50,7 +50,9 @@ def make_dataset_arches(root, mode):
         # file_name_list = ["01_01.laz", "01_02.laz", "01_03.laz", "02_01.laz", "02_02.laz", "02_03.laz", "02_04.laz", "03_01.laz", "03_02.laz", "03_03.laz", "03_04.laz"]
         file_name_list = ["01_01_norm.laz", "01_02_norm.laz", "01_03_norm.laz", "02_01_norm.laz", "02_02_norm.laz", "02_03_norm.laz", "02_04_norm.laz", "03_01_norm.laz", "03_02_norm.laz", "03_03_norm.laz", "03_04_norm.laz"]
     elif mode == 'test':
-        file_name_list = ["01_01.laz", "01_02.laz", "01_03.laz", "02_01.laz", "02_02.laz", "02_03.laz", "02_04.laz", "03_01.laz", "03_02.laz", "03_03.laz", "03_04.laz"]
+        file_name_list = ["04_01_norm.laz", "04_02_norm.laz", "04_03_norm.laz", "04_04_norm.laz"]
+
+        # file_name_list = ["01_01.laz", "01_02.laz", "01_03.laz", "02_01.laz", "02_02.laz", "02_03.laz", "02_04.laz", "03_01.laz", "03_02.laz", "03_03.laz", "03_04.laz"]
     else:
         raise Exception('Mode should be train/test.')
 
@@ -154,7 +156,12 @@ class ArchesLoader(data.Dataset):
     def __getitem__(self, index):
         # pointnet++ dataset
         # Get SOM file
-        dataset_idx = index % 6
+        dataset_idx = index // 6 # 0-len(self.dataset)
+        augmentation_idx = index % 6 # 0-5 
+
+        # if self.mode == "test":
+            # print(f"Length of dataset is (24): {len(self.dataset)}")
+            # print(f"Dataset index is (0-3): {dataset_idx}")
         file = self.dataset[dataset_idx][0:-4]
         # print(f"Just before np load of npz file {file}")
         data = np.load(os.path.join(self.root, '%dx%d' % (self.rows, self.cols), file + '.npz'))
@@ -167,7 +174,10 @@ class ArchesLoader(data.Dataset):
 
         # sn_np = data['sn']
         # seg_np = data['part_label']
-        som_node_np = np.transpose(data['som_node'])
+        som_node_np = data['som_node'] # 3 x 64
+        # som_node_np = np.transpose(data['som_node']) #3x64
+        # print(f"Inital som_node_np shape is {som_node_np.shape}")
+
         label = 1 # dummy value, always 1
         # label = self.folders.index(file[0:8])
         # assert(label >= 0)
@@ -192,34 +202,34 @@ class ArchesLoader(data.Dataset):
             # sn_np = np.concatenate((sn_np, sn_np_redundent), axis=0)
             # seg_np = np.concatenate((seg_np, seg_np_redundent), axis=0)
 
-        print(f"Shape just before augmentation is {pc_np.shape}")
+        # print(f"Shape just before augmentation is {pc_np.shape}")
 
         # print("Just after downsampling")
         # TODO: check augmentation methods. One of them returns Nx3 data instead of 3xN!
         # augmentation
         if self.mode == 'train':
             # index 1-6: 1-3 without noise, 4-6 with noise
-            if dataset_idx >= 3:
+            if augmentation_idx >= 3:
                 # print("Adding random noise")
                 pc_np = random_noise(pc_np, -1, 1)
                 som_node_np = random_noise(som_node_np, -1, 1)
                 # print("After adding random noise")
                 # print(f"pc_np.shape: {pc_np.shape}")
             
-            print(f"Shape after random noise is {pc_np.shape}")
+            # print(f"Shape after random noise is {som_node_np.shape}")
 
 
             # 0, 3 = -45
             # 1, 4 = 0
             # 2, 5 = 45
-            rotation_angle = self.rotations[dataset_idx % len(self.rotations)]
+            rotation_angle = self.rotations[augmentation_idx % len(self.rotations)]
             if rotation_angle != 0:
                 # print("Rotating point cloud")
                 pc_np = rotate_point_cloud(pc_np, rotation_angle)
                 som_node_np = rotate_point_cloud(som_node_np, rotation_angle)
                 # print("After rotating point cloud")
 
-            print(f"Shape after rotation is {pc_np.shape}")
+            # print(f"Shape after rotation is {som_node_np.shape}")
 
             # rotate by random degree over model z (point coordinate y) axis
             # pc_np = rotate_point_cloud(pc_np)
@@ -258,14 +268,16 @@ class ArchesLoader(data.Dataset):
 
         # kNN search: som -> som
         if self.opt.som_k >= 2:
-            D, I = self.knn_builder.self_build_search(som_node_np)
+            # print(f"Shape of some_node_np is {som_node_np.shape}")
+            D, I = self.knn_builder.self_build_search(som_node_np.transpose()) # Input is Nx3
             som_knn_I = torch.from_numpy(I.astype(np.int64))  # node_num x som_k
+            # print(f"som_knn_I shape (64 x 9): {som_knn_I.shape}")
         else:
             som_knn_I = torch.from_numpy(np.arange(start=0, stop=self.opt.node_num, dtype=np.int64).reshape(
                 (self.opt.node_num, 1)))  # node_num x 1
         # print("Just before returning")
 
-        print(f"Final shape of pc is {pc.shape}. Index is {dataset_idx}")
+        # print(f"Final shape of pc is {pc.shape}. Index is {augmentation_idx}")
 
         return pc, label, som_node, som_knn_I
 

@@ -95,9 +95,9 @@ if __name__=='__main__':
 
                 errors = model.get_current_errors()
                 
-                print(model.test_loss.item())
-                print(errors)
-                print()
+                # print(model.test_loss.item())
+                # print(errors)
+                # print()
 
                 # visualizer.print_current_errors(epoch, epoch_iter, errors, t)
                 # visualizer.plot_current_errors(epoch, float(epoch_iter) / dataset_size, opt, errors)
@@ -127,7 +127,7 @@ if __name__=='__main__':
             model.test_loss /= batch_amount
             if model.test_loss.item() < best_loss:
                 best_loss = model.test_loss.item()
-            print('Tested network. So far lowest loss: %f' % best_loss )
+            print('Tested network. So far lowest loss: %f' % best_loss)
 
         # learning rate decay
         if epoch%20==0 and epoch>0:
