@@ -70,6 +70,7 @@ if __name__=='__main__':
 
         epoch_iter = 0
         for i, data in enumerate(trainloader):
+            print(f"Getting batch number {i}")
             iter_start_time = time.time()
             epoch_iter += opt.batch_size
 
