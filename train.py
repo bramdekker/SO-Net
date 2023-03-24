@@ -24,7 +24,7 @@ from data.shapenet_loader import ShapeNetLoader
 # Get full dataset and then split in train- and testloader.
 # Split dataset 70 for autoencoder (11 samples), 15 supervised training segmenter (2 samples), 15 validation segmenter (2 samples).
 # Need to make sure that the data samples are non-overlapping, or can autoencoder be trained on all data?
-# Normalize data: normalized to be zero-mean inside a unit cube 0-1
+# Normalize data: normalized to be zero-mean to range [-1, 1]
 # Use augmentation (rotation, downsampling, translation) to get more data.
 # What do I want to test? Train autoencoder on a lot of data, also augmented.
 # The generated clusters should be good so that they can be labeled by a user (better to have smaller clusters, then big)
