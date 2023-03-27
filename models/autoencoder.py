@@ -40,6 +40,7 @@ class Model():
 
         # record the test loss and accuracy
         self.test_loss = torch.FloatTensor([0])
+        # self.train_loss = 0
 
         if self.opt.gpu_id >= 0:
             self.input_pc = self.input_pc.to(self.opt.device)
@@ -97,6 +98,8 @@ class Model():
             self.loss = self.loss_chamfer + self.loss_chamfer_conv5 + self.loss_chamfer_conv4
         else:
             self.loss = self.loss_chamfer
+
+        # self.train_loss = self.loss.item().cpu()
 
         self.loss.backward()
 

@@ -88,17 +88,17 @@ if __name__=='__main__':
     test_losses = []
 
     best_loss = 99
-    n_epochs = 5 # 100
+    n_epochs = 10 # 100
     for epoch in range(n_epochs):
         begin_epoch = time.time()
 
         epoch_iter = 0
         train_loss = 0
+        batch_amount = 0
         for i, data in enumerate(trainloader):
             # print(f"Getting batch number {i}")
             iter_start_time = time.time()
             epoch_iter += opt.batch_size
-            batch_amount = 0
 
             # data contains multiple point clouds!
             # print(f"Data length (==batchsize=4): {len(data)}")
@@ -112,13 +112,13 @@ if __name__=='__main__':
                 model.set_input(input_pc, input_label, input_node, input_node_knn_I)
 
             batch_amount += input_label.size()[0]
-            print(f"Input label.size()[0] is {input_label.size()[0]} ")
+            # print(f"Input label.size()[0] is {input_label.size()[0]} ")
             # print('About to optimize the model based on current training batch')
             model.optimize()
             # print('After optimizing the model based on current training batch')
 
 
-            train_loss += model.loss.detach() * input_label.size()[0]
+            train_loss += model.loss.detach().cpu() * input_label.size()[0]
 
             if i % 10 == 0:
                 # print/plot errors
@@ -138,9 +138,9 @@ if __name__=='__main__':
                 # visualizer.display_current_results(visuals, epoch, i)
 
         train_loss /= batch_amount
-        print(f"Batch amount is {batch_amount}")
+        # print(f"Batch amount is {batch_amount}")
 
-        train_losses.append(model.loss.cpu().item())
+        train_losses.append(train_loss)
 
         end_train = time.time()
         print(f"Epoch {epoch} took {end_train-begin_epoch} seconds.")
@@ -149,6 +149,7 @@ if __name__=='__main__':
         if epoch >= 0 and epoch%1==0:
             batch_amount = 0
             model.test_loss.data.zero_()
+            test_loss = 0
             for i, data in enumerate(testloader):
                 if opt.dataset == 'modelnet' or opt.dataset=='shrec':
                     input_pc, input_sn, input_label, input_node, input_node_knn_I = data
@@ -163,12 +164,16 @@ if __name__=='__main__':
                 # # accumulate loss
                 # TODO: why is loss multiplied here?! To average out loss per data sample?
                 model.test_loss += model.loss_chamfer.detach() * input_label.size()[0]
-                print(f"TEST: Input_label.size()[0] is {input_label.size()[0]}")
+                test_loss += model.loss.detach().cpu() * input_label.size()[0]
+
+                # print(f"TEST: Input_label.size()[0] is {input_label.size()[0]}")
 
             model.test_loss /= batch_amount
-            print(f"TEST: Batch amount is {batch_amount}")
+            test_loss /= batch_amount
+            # print(f"TEST: Batch amount is {batch_amount}")
 
-            test_losses.append(model.test_loss.cpu().item())
+            # test_losses.append(model.test_loss.cpu().item())
+            test_losses.append(test_loss)
 
             if model.test_loss.item() < best_loss:
                 best_loss = model.test_loss.item()
@@ -189,6 +194,9 @@ if __name__=='__main__':
 
     print(f"Length of all training losses should be equal to number of epochs (5): {len(train_losses)}")
     print(f"Length of all test losses should be equal to number of epochs (5): {len(test_losses)}")
+
+    print("Train losses: ", train_losses)
+    print("Test losses: ", test_losses)
 
     plot_train_test_loss(n_epochs, train_losses, test_losses)
 
