@@ -163,20 +163,22 @@ if __name__=='__main__':
 
                 # # accumulate loss
                 # TODO: why is loss multiplied here?! To average out loss per data sample?
-                model.test_loss += model.loss_chamfer.detach() * input_label.size()[0]
+                # model.test_loss += model.loss_chamfer.detach() * input_label.size()[0]
                 test_loss += model.loss.detach().cpu() * input_label.size()[0]
 
                 # print(f"TEST: Input_label.size()[0] is {input_label.size()[0]}")
 
-            model.test_loss /= batch_amount
+            # model.test_loss /= batch_amount
             test_loss /= batch_amount
             # print(f"TEST: Batch amount is {batch_amount}")
 
             # test_losses.append(model.test_loss.cpu().item())
             test_losses.append(test_loss)
 
-            if model.test_loss.item() < best_loss:
-                best_loss = model.test_loss.item()
+            if test_loss < best_loss:
+                best_loss = test_loss
+            # if model.test_loss.item() < best_loss:
+            #     best_loss = model.test_loss.item()
             print('Tested network. So far lowest loss: %f' % best_loss)
 
         end_test = time.time()

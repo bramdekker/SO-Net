@@ -64,6 +64,24 @@ class Model():
     def forward(self, is_train=False, epoch=None):
         self.feature = self.encoder(self.pc, self.sn, self.input_node, self.input_node_knn_I, is_train, epoch)  # Bx1024
         self.predicted_pc = self.decoder(self.feature)
+        print(f"Predicted point cloud: {self.predicted_pc}")
+        print(f"Predicted point cloud: {self.predicted_pc.item()}")
+
+        # my_data = input_pc.numpy()[0]
+		# # 1. Create a new header
+        # header = laspy.LasHeader(point_format=6, version="1.4")
+		# #header.offsets = np.min(my_data, axis=0)
+
+		# # 2. Create a Las
+        # las = laspy.LasData(header)
+
+        # las.x = my_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+        # las.y = my_data[1]
+        # las.z = my_data[2]
+        # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
+
+        # las.write("train_seg_catenary.las")
+
 
     def optimize(self, epoch=None):
         # random point dropout
