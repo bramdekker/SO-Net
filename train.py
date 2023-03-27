@@ -112,6 +112,7 @@ if __name__=='__main__':
                 model.set_input(input_pc, input_label, input_node, input_node_knn_I)
 
             batch_amount += input_label.size()[0]
+            print(f"Input label.size()[0] is {input_label.size()[0]} ")
             # print('About to optimize the model based on current training batch')
             model.optimize()
             # print('After optimizing the model based on current training batch')
@@ -137,6 +138,7 @@ if __name__=='__main__':
                 # visualizer.display_current_results(visuals, epoch, i)
 
         train_loss /= batch_amount
+        print(f"Batch amount is {batch_amount}")
 
         train_losses.append(model.loss.cpu().item())
 
@@ -161,8 +163,10 @@ if __name__=='__main__':
                 # # accumulate loss
                 # TODO: why is loss multiplied here?! To average out loss per data sample?
                 model.test_loss += model.loss_chamfer.detach() * input_label.size()[0]
+                print(f"TEST: Input_label.size()[0] is {input_label.size()[0]}")
 
             model.test_loss /= batch_amount
+            print(f"TEST: Batch amount is {batch_amount}")
 
             test_losses.append(model.test_loss.cpu().item())
 
