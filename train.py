@@ -138,7 +138,7 @@ if __name__=='__main__':
 
         train_loss /= batch_amount
 
-        train_losses.append(model.loss)
+        train_losses.append(model.loss.cpu().item())
 
         end_train = time.time()
         print(f"Epoch {epoch} took {end_train-begin_epoch} seconds.")
@@ -164,7 +164,7 @@ if __name__=='__main__':
 
             model.test_loss /= batch_amount
 
-            test_losses.append(model.test_loss)
+            test_losses.append(model.test_loss.cpu().item())
 
             if model.test_loss.item() < best_loss:
                 best_loss = model.test_loss.item()
@@ -186,7 +186,7 @@ if __name__=='__main__':
     print(f"Length of all training losses should be equal to number of epochs (5): {len(train_losses)}")
     print(f"Length of all test losses should be equal to number of epochs (5): {len(test_losses)}")
 
-    plot_train_test_loss(n_epochs, train_losses.detach().cpu(), test_losses.detach().cpu())
+    plot_train_test_loss(n_epochs, train_losses, test_losses)
 
 
 
