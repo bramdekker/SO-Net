@@ -118,7 +118,7 @@ if __name__=='__main__':
             # print('After optimizing the model based on current training batch')
 
 
-            train_loss += model.loss.detach().cpu() * input_label.size()[0]
+            train_loss += model.loss.cpu() * input_label.size()[0]
 
             if i % 10 == 0:
                 # print/plot errors
