@@ -65,8 +65,7 @@ class Model():
         self.feature = self.encoder(self.pc, self.sn, self.input_node, self.input_node_knn_I, is_train, epoch)  # Bx1024
         self.predicted_pc = self.decoder(self.feature)
         print(f"Predicted point cloud: {self.predicted_pc}")
-        print("This is just a test print!")
-        print(f"Predicted point cloud: {self.predicted_pc.numpy().shape}")
+        print(f"Predicted point cloud: {self.predicted_pc.cpu().numpy().shape}")
 
         # my_data = input_pc.numpy()[0]
 		# # 1. Create a new header
