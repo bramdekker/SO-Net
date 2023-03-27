@@ -23,7 +23,7 @@ from data.shapenet_loader import ShapeNetLoader
 # from util.visualizer import Visualizer
 
 # TODO: track training / test time
-
+# batch size = 8 / input_pc_num = 16384
 # TODO: visualize training and test losses
 
 def plot_train_test_loss(epochs, train_loss, test_loss):
@@ -186,7 +186,7 @@ if __name__=='__main__':
     print(f"Length of all training losses should be equal to number of epochs (5): {len(train_losses)}")
     print(f"Length of all test losses should be equal to number of epochs (5): {len(test_losses)}")
 
-    plot_train_test_loss(n_epochs, train_losses, test_losses)
+    plot_train_test_loss(n_epochs, train_losses.detach().cpu(), test_losses.detach().cpu())
 
 
 
