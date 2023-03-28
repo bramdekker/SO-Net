@@ -64,6 +64,8 @@ class Model():
     def forward(self, is_train=False, epoch=None):
         self.feature = self.encoder(self.pc, self.sn, self.input_node, self.input_node_knn_I, is_train, epoch)  # Bx1024
         self.predicted_pc = self.decoder(self.feature)
+
+        # Batch size: [[x0,..xn], [y0,...,yn], [z0,...,zn]]
         print(f"Predicted point cloud: {self.predicted_pc}")
         print(f"Predicted point cloud: {self.predicted_pc.cpu().detach().numpy().shape}")
 

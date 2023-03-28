@@ -2,6 +2,7 @@ import time
 import copy
 import numpy as np
 import math
+import laspy
 import matplotlib.pyplot as plt
 
 from options import Options
@@ -137,6 +138,45 @@ if __name__=='__main__':
                 # visuals = model.get_current_visuals()
                 # visualizer.display_current_results(visuals, epoch, i)
 
+        if epoch == 1: # n_epochs - 1
+            input_pred_dict = model.get_current_visuals()
+            input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
+            print(f"Length of input entry is {len(input_pc)}")
+
+            for i in range(len(input_pc)):
+                # Save original point cloud.
+                input_data = input_pc[i]
+                # 1. Create a new header
+                header = laspy.LasHeader(point_format=6, version="1.4")
+                #header.offsets = np.min(my_data, axis=0)
+
+                # 2. Create a Las
+                las = laspy.LasData(header)
+
+                las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+                las.y = input_data[1]
+                las.z = input_data[2]
+                # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
+
+                las.write("original_pc_%d.las" % i)
+
+                # Save predicted point cloud.
+                predicted_data = predicted_pc[i]
+                # 1. Create a new header
+                header = laspy.LasHeader(point_format=6, version="1.4")
+                #header.offsets = np.min(my_data, axis=0)
+
+                # 2. Create a Las
+                las = laspy.LasData(header)
+
+                las.x = predicted_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+                las.y = predicted_data[1]
+                las.z = predicted_data[2]
+                # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
+
+                las.write("predicted_pc_%d.las" % i)
+
+
         train_loss /= batch_amount
         # print(f"Batch amount is {batch_amount}")
 
@@ -161,8 +201,7 @@ if __name__=='__main__':
 
                 batch_amount += input_label.size()[0]
 
-                # # accumulate loss
-                # TODO: why is loss multiplied here?! To average out loss per data sample?
+                # accumulate loss
                 # model.test_loss += model.loss_chamfer.detach() * input_label.size()[0]
                 test_loss += model.loss.detach().cpu() * input_label.size()[0]
 
@@ -194,8 +233,8 @@ if __name__=='__main__':
             model.save_network(model.encoder, 'encoder', '%d_%f' % (epoch, model.test_loss.item()), opt.gpu_id)
             model.save_network(model.decoder, 'decoder', '%d_%f' % (epoch, model.test_loss.item()), opt.gpu_id)
 
-    print(f"Length of all training losses should be equal to number of epochs (5): {len(train_losses)}")
-    print(f"Length of all test losses should be equal to number of epochs (5): {len(test_losses)}")
+    print(f"Length of all training losses should be equal to number of epochs ({n_epochs}): {len(train_losses)}")
+    print(f"Length of all test losses should be equal to number of epochs ({n_epochs}): {len(test_losses)}")
 
     print("Train losses: ", train_losses)
     print("Test losses: ", test_losses)
