@@ -119,7 +119,7 @@ if __name__=='__main__':
             # print('After optimizing the model based on current training batch')
 
 
-            train_loss += model.loss.cpu() * input_label.size()[0]
+            train_loss += model.loss.cpu().data * input_label.size()[0]
 
             if i % 10 == 0:
                 # print/plot errors
@@ -167,14 +167,14 @@ if __name__=='__main__':
                 #header.offsets = np.min(my_data, axis=0)
 
                 # 2. Create a Las
-                las = laspy.LasData(header)
+                las2 = laspy.LasData(header)
 
-                las.x = predicted_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
-                las.y = predicted_data[1]
-                las.z = predicted_data[2]
+                las2.x = predicted_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+                las2.y = predicted_data[1]
+                las2.z = predicted_data[2]
                 # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
 
-                las.write("predicted_pc_%d.las" % i)
+                las2.write("predicted_pc_%d.las" % i)
 
 
         train_loss /= batch_amount
@@ -203,7 +203,7 @@ if __name__=='__main__':
 
                 # accumulate loss
                 # model.test_loss += model.loss_chamfer.detach() * input_label.size()[0]
-                test_loss += model.loss.detach().cpu() * input_label.size()[0]
+                test_loss += model.loss.cpu().data * input_label.size()[0]
 
                 # print(f"TEST: Input_label.size()[0] is {input_label.size()[0]}")
 
