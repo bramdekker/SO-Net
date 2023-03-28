@@ -89,8 +89,7 @@ if __name__=='__main__':
     test_losses = []
 
     best_loss = 99
-    n_epochs = 10 # 100
-    for epoch in range(n_epochs):
+    for epoch in range(opt.epochs):
         begin_epoch = time.time()
 
         epoch_iter = 0
@@ -233,13 +232,13 @@ if __name__=='__main__':
             model.save_network(model.encoder, 'encoder', '%d_%f' % (epoch, model.test_loss.item()), opt.gpu_id)
             model.save_network(model.decoder, 'decoder', '%d_%f' % (epoch, model.test_loss.item()), opt.gpu_id)
 
-    print(f"Length of all training losses should be equal to number of epochs ({n_epochs}): {len(train_losses)}")
-    print(f"Length of all test losses should be equal to number of epochs ({n_epochs}): {len(test_losses)}")
+    print(f"Length of all training losses should be equal to number of epochs ({opt.epochs}): {len(train_losses)}")
+    print(f"Length of all test losses should be equal to number of epochs ({opt.epochs}): {len(test_losses)}")
 
     print("Train losses: ", train_losses)
     print("Test losses: ", test_losses)
 
-    plot_train_test_loss(n_epochs, train_losses, test_losses)
+    plot_train_test_loss(opt.epochs, train_losses, test_losses)
 
 
 

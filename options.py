@@ -18,6 +18,7 @@ class Options():
         self.parser.add_argument('--name', type=str, default='train', help='name of the experiment. It decides where to store samples and models')
         self.parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints_catenary', help='models are saved here')
 
+        self.parser.add_argument('--epochs', type=int, default=5, help='number of training epochs')
         self.parser.add_argument('--batch_size', type=int, default=8, help='input batch size')
         self.parser.add_argument('--input_pc_num', type=int, default=131072, help='# of input points')
         self.parser.add_argument('--surface_normal', type=bool, default=False, help='use surface normal in the pc input')
