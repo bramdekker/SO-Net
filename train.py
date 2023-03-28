@@ -138,7 +138,7 @@ if __name__=='__main__':
                 # visuals = model.get_current_visuals()
                 # visualizer.display_current_results(visuals, epoch, i)
 
-        if epoch == 1: # n_epochs - 1
+        if epoch == 9: # n_epochs - 1
             input_pred_dict = model.get_current_visuals()
             input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
             print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
