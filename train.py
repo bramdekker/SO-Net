@@ -141,7 +141,7 @@ if __name__=='__main__':
         if epoch == 1: # n_epochs - 1
             input_pred_dict = model.get_current_visuals()
             input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
-            print(f"Length of input entry is {len(input_pc)}")
+            print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
 
             for i in range(len(input_pc)):
                 # Save original point cloud.

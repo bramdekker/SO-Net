@@ -152,8 +152,11 @@ class Model():
     # visualization with visdom
     def get_current_visuals(self):
         # display only one instance of pc/img
-        input_pc_np = self.input_pc[0].cpu().numpy()
-        predicted_pc_np = self.predicted_pc.cpu().data[0].numpy()
+        # input_pc_np = self.input_pc[0].cpu().numpy()
+        # predicted_pc_np = self.predicted_pc.cpu().data[0].numpy()
+
+        input_pc_np = self.input_pc.cpu().numpy()
+        predicted_pc_np = self.predicted_pc.cpu().data.numpy()
 
         return OrderedDict([('input_pc', input_pc_np),('predicted_pc', predicted_pc_np)])
 
