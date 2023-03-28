@@ -78,6 +78,16 @@ if __name__=='__main__':
         raise Exception('Dataset error.')
 
     model = Model(opt)
+    pytorch_total_encoder_params = sum(p.numel() for p in model.encoder.parameters())
+    pytorch_total_decoder_params = sum(p.numel() for p in model.decoder.parameters())
+    print(f"Total number of parameters in encoder ({pytorch_total_encoder_params}) and decoder ({pytorch_total_decoder_params}): {pytorch_total_encoder_params + pytorch_total_decoder_params}")
+
+    pytorch_train_encoder_params = sum(p.numel() for p in model.encoder.parameters() if p.requires_grad)
+    pytorch_train_decoder_params = sum(p.numel() for p in model.decoder.parameters() if p.requires_grad)
+    print(f"Total number of trainable parameters in encoder ({pytorch_train_encoder_params}) and decoder ({pytorch_train_decoder_params}): {pytorch_train_encoder_params + pytorch_train_decoder_params}")
+
+    before_train_mem = torch.cuda.memory_allocated(opt.device)
+    print(f"Amount of GPU memory allocated in MB before training (approx. 15.000 available): {before_train_mem / 1000000}")
 
     # visualizer = Visualizer(opt)
 
@@ -110,6 +120,8 @@ if __name__=='__main__':
                 # print('Going to unpack the data of a single batch')
                 input_pc, input_label, input_node, input_node_knn_I = data # pc, label, som_node, som_knn_I
                 model.set_input(input_pc, input_label, input_node, input_node_knn_I)
+                after_loading_input_mem = torch.cuda.memory_allocated(opt.device)
+                print(f"Amount of GPU memory allocated in MB after loading input: {after_loading_input_mem / 1000000}")
 
             batch_amount += input_label.size()[0]
             # print(f"Input label.size()[0] is {input_label.size()[0]} ")
@@ -120,11 +132,11 @@ if __name__=='__main__':
 
             train_loss += model.loss.cpu().data * input_label.size()[0]
 
-            if i % 10 == 0:
+            # if i % 10 == 0:
                 # print/plot errors
                 # t = (time.time() - iter_start_time) / opt.batch_size
 
-                errors = model.get_current_errors()
+                # errors = model.get_current_errors()
 
                 # print(model.test_loss.item())
                 # print(errors)
@@ -136,6 +148,9 @@ if __name__=='__main__':
                 # print(model.autoencoder.encoder.feature)
                 # visuals = model.get_current_visuals()
                 # visualizer.display_current_results(visuals, epoch, i)
+
+            after_batch_mem = torch.cuda.memory_allocated(opt.device)
+            print(f"Amount of GPU memory allocated in MB after batch training: {after_batch_mem / 1000000}")
 
         if epoch == 9: # n_epochs - 1
             input_pred_dict = model.get_current_visuals()
@@ -186,38 +201,39 @@ if __name__=='__main__':
 
         # test network
         if epoch >= 0 and epoch%1==0:
-            batch_amount = 0
-            model.test_loss.data.zero_()
-            test_loss = 0
-            for i, data in enumerate(testloader):
-                if opt.dataset == 'modelnet' or opt.dataset=='shrec':
-                    input_pc, input_sn, input_label, input_node, input_node_knn_I = data
-                    model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
-                elif opt.dataset == 'shapenet' or 'catenary_arches':
-                    input_pc, input_label, input_node, input_node_knn_I = data
-                    model.set_input(input_pc, input_label, input_node, input_node_knn_I)
-                model.test_model()
+            with torch.no_grad():
+                batch_amount = 0
+                model.test_loss.data.zero_()
+                test_loss = 0
+                for i, data in enumerate(testloader):
+                    if opt.dataset == 'modelnet' or opt.dataset=='shrec':
+                        input_pc, input_sn, input_label, input_node, input_node_knn_I = data
+                        model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
+                    elif opt.dataset == 'shapenet' or 'catenary_arches':
+                        input_pc, input_label, input_node, input_node_knn_I = data
+                        model.set_input(input_pc, input_label, input_node, input_node_knn_I)
+                    model.test_model()
 
-                batch_amount += input_label.size()[0]
+                    batch_amount += input_label.size()[0]
 
-                # accumulate loss
-                # model.test_loss += model.loss_chamfer.detach() * input_label.size()[0]
-                test_loss += model.loss.cpu().data * input_label.size()[0]
+                    # accumulate loss
+                    # model.test_loss += model.loss_chamfer.detach() * input_label.size()[0]
+                    test_loss += model.loss.cpu().data * input_label.size()[0]
 
-                # print(f"TEST: Input_label.size()[0] is {input_label.size()[0]}")
+                    # print(f"TEST: Input_label.size()[0] is {input_label.size()[0]}")
 
-            # model.test_loss /= batch_amount
-            test_loss /= batch_amount
-            # print(f"TEST: Batch amount is {batch_amount}")
+                # model.test_loss /= batch_amount
+                test_loss /= batch_amount
+                # print(f"TEST: Batch amount is {batch_amount}")
 
-            # test_losses.append(model.test_loss.cpu().item())
-            test_losses.append(test_loss)
+                # test_losses.append(model.test_loss.cpu().item())
+                test_losses.append(test_loss)
 
-            if test_loss < best_loss:
-                best_loss = test_loss
-            # if model.test_loss.item() < best_loss:
-            #     best_loss = model.test_loss.item()
-            print('Tested network. So far lowest loss: %f' % best_loss)
+                if test_loss < best_loss:
+                    best_loss = test_loss
+                # if model.test_loss.item() < best_loss:
+                #     best_loss = model.test_loss.item()
+                print('Tested network. So far lowest loss: %f' % best_loss)
 
         end_test = time.time()
         print(f"Testing after epoch {epoch} took {end_test-end_train} seconds.")
