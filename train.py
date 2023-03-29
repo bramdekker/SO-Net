@@ -100,7 +100,7 @@ if __name__=='__main__':
 
     # ~270 million params (PointNet ~ 4M, MVCNN ~ 60M)
     model = Model(opt)
-    count_parameters(model)
+    count_parameters(model.decoder)
 
     pytorch_total_encoder_params = sum(p.numel() for p in model.encoder.parameters())
     pytorch_total_decoder_params = sum(p.numel() for p in model.decoder.parameters())
