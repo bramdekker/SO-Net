@@ -16,6 +16,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import random
 import numpy as np
+from prettytable import PrettyTable
 
 from models.autoencoder import Model
 from data.modelnet_shrec_loader import ModelNet_Shrec_Loader
@@ -26,6 +27,14 @@ from data.shapenet_loader import ShapeNetLoader
 # TODO: track training / test time
 # batch size = 8 / input_pc_num = 16384
 # TODO: visualize training and test losses
+# Number of parameters in decoder SO-Net (in paper):
+# - Conv part: 
+#       - 
+# - FC part: 27.273.728 params
+#       - 1st: 1024 * 2048 (weights) + 2048 (biases) = 2.099.200
+#       - 2nd: 2048 * 3072 (weights) + 3072 (biases) = 6.294.528
+#       - 3rd: 3072 * 4096 + 4096 = 12.587.008
+#       - 4th: 4096 * 512 * 3 + 512 * 3 = 6.292.992
 
 def plot_train_test_loss(epochs, train_loss, test_loss):
     """Plot the average train and testloss per epoch on a line plot."""
@@ -38,6 +47,18 @@ def plot_train_test_loss(epochs, train_loss, test_loss):
     plt.legend()
     plt.savefig(f'train_test_loss_{epochs}epochs')
     plt.show()
+
+def count_parameters(model):
+    table = PrettyTable(["Modules", "Parameters"])
+    total_params = 0
+    for name, parameter in model.named_parameters():
+        if not parameter.requires_grad: continue
+        params = parameter.numel()
+        table.add_row([name, params])
+        total_params+=params
+    print(table)
+    print(f"Total Trainable Params: {total_params}")
+    return total_params
 
 # Get full dataset and then split in train- and testloader.
 # Split dataset 70 for autoencoder (11 samples), 15 supervised training segmenter (2 samples), 15 validation segmenter (2 samples).
@@ -77,7 +98,10 @@ if __name__=='__main__':
     else:
         raise Exception('Dataset error.')
 
+    # ~270 million params (PointNet ~ 4M, MVCNN ~ 60M)
     model = Model(opt)
+    count_parameters(model)
+
     pytorch_total_encoder_params = sum(p.numel() for p in model.encoder.parameters())
     pytorch_total_decoder_params = sum(p.numel() for p in model.decoder.parameters())
     print(f"Total number of parameters in encoder ({pytorch_total_encoder_params}) and decoder ({pytorch_total_decoder_params}): {pytorch_total_encoder_params + pytorch_total_decoder_params}")
