@@ -160,8 +160,6 @@ class ArchesLoader(data.Dataset):
         dataset_idx = index // 6 # 0-len(self.dataset)
         augmentation_idx = index % 6 # 0-5 
 
-        print(f"Data on index {index} has data idx {dataset_idx} and augmentation idx {augmentation_idx} in arches_loader.py")
-
 
         # if self.mode == "test":
             # print(f"Length of dataset is (24): {len(self.dataset)}")
@@ -190,7 +188,7 @@ class ArchesLoader(data.Dataset):
         # Downsample to the number of input points specified in options.
         # TODO: downsampling seems to not work correctly!
         if self.opt.input_pc_num < pc_np.shape[1]:
-            print()
+            print(f"Data on index {index} has data idx {dataset_idx} and augmentation idx {augmentation_idx} in arches_loader.py")
             # print(f"pc_np.shape: {pc_np.shape}")
             chosen_idx = np.random.choice(pc_np.shape[1], self.opt.input_pc_num, replace=False)
             # pc_np = pc_np[chosen_idx, :]
