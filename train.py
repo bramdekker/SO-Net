@@ -139,6 +139,7 @@ if __name__=='__main__':
                 break
 
             # Go over first 12 ~ 3 batches and just save original (downsampled) pc to check if correct!
+            # Only 1_1 is correct, all others is just random noise in unit cube!!! Probably rotation + noise is deforming them. 
             input_pc, input_label, input_node, input_node_knn_I = data # pc, label, som_node, som_knn_I
 
             for j, pc in enumerate(input_pc):

@@ -125,6 +125,7 @@ class ArchesLoader(data.Dataset):
         self.rows = round(math.sqrt(self.node_num))
         self.cols = self.rows
 
+        self.noise_value = 0.000001
         self.rotations = [-45, 0, 45]
 
         # Add random noise: what value to base it on? Normalized data, biggest max-min difference?
@@ -186,6 +187,7 @@ class ArchesLoader(data.Dataset):
         # Downsample to the number of input points specified in options.
         # TODO: downsampling seems to not work correctly!
         if self.opt.input_pc_num < pc_np.shape[1]:
+            print()
             # print(f"pc_np.shape: {pc_np.shape}")
             chosen_idx = np.random.choice(pc_np.shape[1], self.opt.input_pc_num, replace=False)
             # pc_np = pc_np[chosen_idx, :]
@@ -212,8 +214,8 @@ class ArchesLoader(data.Dataset):
             # index 1-6: 1-3 without noise, 4-6 with noise
             if augmentation_idx >= 3:
                 # print("Adding random noise")
-                pc_np = random_noise(pc_np, -1, 1)
-                som_node_np = random_noise(som_node_np, -1, 1)
+                pc_np = random_noise(pc_np, -self.noise_value, self.noise_value)
+                som_node_np = random_noise(som_node_np, -self.noise_value, self.noise_value)
                 # print("After adding random noise")
                 # print(f"pc_np.shape: {pc_np.shape}")
             
