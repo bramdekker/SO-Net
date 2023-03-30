@@ -92,7 +92,7 @@ if __name__=='__main__':
     elif opt.dataset=='catenary_arches':
         trainset = ArchesLoader(opt.dataroot, 'train', opt)
         dataset_size = len(trainset)
-        trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
+        trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
         print('#training point clouds = %d' % len(trainset))
 
         testset = ArchesLoader(opt.dataroot, 'test', opt)
