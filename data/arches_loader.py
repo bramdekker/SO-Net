@@ -160,7 +160,7 @@ class ArchesLoader(data.Dataset):
         dataset_idx = index // 6 # 0-len(self.dataset)
         augmentation_idx = index % 6 # 0-5 
 
-        print(f"Data idx {dataset_idx} and augmentation idx {augmentation_idx} in arches_loader.py")
+        print(f"Data on index {index} has data idx {dataset_idx} and augmentation idx {augmentation_idx} in arches_loader.py")
 
 
         # if self.mode == "test":
