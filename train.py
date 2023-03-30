@@ -145,7 +145,7 @@ if __name__=='__main__':
             for j, pc in enumerate(input_pc):
                 data_idx = (i * 4 + j) // 6
                 augment_idx = (i * 4 + j) % 6
-                print(f"Data idx {data_idx} and augmentation idx {augment_idx} in train.py")
+                # print(f"Data idx {data_idx} and augmentation idx {augment_idx} in train.py")
 
                 header = laspy.LasHeader(point_format=6, version="1.4")
                 #header.offsets = np.min(my_data, axis=0)

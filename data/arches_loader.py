@@ -187,7 +187,6 @@ class ArchesLoader(data.Dataset):
         # print("Just before downsampling")
         # Downsample to the number of input points specified in options.
         if self.opt.input_pc_num < pc_np.shape[1]:
-            print(f"Data idx {dataset_idx} and augmentation idx {augmentation_idx} in arches_loader.py")
             # print(f"pc_np.shape: {pc_np.shape}")
             chosen_idx = np.random.choice(pc_np.shape[1], self.opt.input_pc_num, replace=False)
             # pc_np = pc_np[chosen_idx, :]
