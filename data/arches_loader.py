@@ -126,7 +126,7 @@ class ArchesLoader(data.Dataset):
         self.cols = self.rows
 
         self.noise_value = 0.000001
-        self.rotations = [-45, 0, 45]
+        self.rotations = [-30, 0, 30]
 
         # Add random noise: what value to base it on? Normalized data, biggest max-min difference?
 
