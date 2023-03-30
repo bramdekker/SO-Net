@@ -135,35 +135,28 @@ if __name__=='__main__':
         train_loss = 0
         batch_amount = 0
         for i, data in enumerate(trainloader):
-            if i >= 3:
-                break
+            # for j, pc in enumerate(input_pc):
+            #     data_idx = (i * 4 + j) // 6
+            #     augment_idx = (i * 4 + j) % 6
+            #     # print(f"Data idx {data_idx} and augmentation idx {augment_idx} in train.py")
 
-            # Go over first 12 ~ 3 batches and just save original (downsampled) pc to check if correct!
-            # Only 1_1 is correct, all others is just random noise in unit cube!!! Probably rotation + noise is deforming them. 
-            input_pc, input_label, input_node, input_node_knn_I = data # pc, label, som_node, som_knn_I
+            #     header = laspy.LasHeader(point_format=6, version="1.4")
+            #     #header.offsets = np.min(my_data, axis=0)
 
-            for j, pc in enumerate(input_pc):
-                data_idx = (i * 4 + j) // 6
-                augment_idx = (i * 4 + j) % 6
-                # print(f"Data idx {data_idx} and augmentation idx {augment_idx} in train.py")
+            #     # 2. Create a Las
+            #     las = laspy.LasData(header)
 
-                header = laspy.LasHeader(point_format=6, version="1.4")
-                #header.offsets = np.min(my_data, axis=0)
+            #     # print(f"Original pc shape is {pc.shape}")
+            #     # print(f"Pc first 10 is {pc[0][:10]}")
 
-                # 2. Create a Las
-                las = laspy.LasData(header)
+            #     las.x = pc.numpy()[0] # Array with all x coefficients. [x1, x2, ..., xn]
+            #     las.y = pc.numpy()[1]
+            #     las.z = pc.numpy()[2]
+            #     # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
 
-                # print(f"Original pc shape is {pc.shape}")
-                # print(f"Pc first 10 is {pc[0][:10]}")
+            #     las.write("original_pc_%d_%d.las" % (data_idx, augment_idx))
 
-                las.x = pc.numpy()[0] # Array with all x coefficients. [x1, x2, ..., xn]
-                las.y = pc.numpy()[1]
-                las.z = pc.numpy()[2]
-                # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
-
-                las.write("original_pc_%d_%d.las" % (data_idx, augment_idx))
-
-            continue
+            # continue
 
 
             # print(f"Getting batch number {i}")
