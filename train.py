@@ -151,6 +151,9 @@ if __name__=='__main__':
                 # 2. Create a Las
                 las = laspy.LasData(header)
 
+                print(f"Original pc shape is {pc.shape}")
+                print(f"Pc first 10 is {pc[0][:10]}")
+
                 las.x = pc[0] # Array with all x coefficients. [x1, x2, ..., xn]
                 las.y = pc[1]
                 las.z = pc[2]
