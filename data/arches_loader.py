@@ -160,6 +160,9 @@ class ArchesLoader(data.Dataset):
         dataset_idx = index // 6 # 0-len(self.dataset)
         augmentation_idx = index % 6 # 0-5 
 
+        print(f"Data idx {dataset_idx} and augmentation idx {augmentation_idx} in arches_loader.py")
+
+
         # if self.mode == "test":
             # print(f"Length of dataset is (24): {len(self.dataset)}")
             # print(f"Dataset index is (0-3): {dataset_idx}")
