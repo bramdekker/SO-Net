@@ -31,7 +31,7 @@ class Options():
         self.parser.add_argument('--output_fc_pc_num', type=int, default=512, help='# of fc decoder output points')
         self.parser.add_argument('--output_conv_pc_num', type=int, default=4096, help='# of conv decoder output points')
 
-        self.parser.add_argument('--feature_num', type=int, default=4096, help='length of encoded feature')
+        self.parser.add_argument('--feature_num', type=int, default=1024, help='length of encoded feature')
         self.parser.add_argument('--activation', type=str, default='relu', help='activation function: relu, elu')
         self.parser.add_argument('--normalization', type=str, default='batch', help='normalization function: batch, instance')
 

@@ -417,7 +417,10 @@ class DecoderConv(nn.Module):
 
     def forward(self, x):
         # reshape from feature vector NxC, to NxCx1x1
+
+        print(f"Shape of x before reshape is (batch_size x feature_num) {x.shape}")
         x = x.view(-1, self.feature_num, 1, 1)
+        print(f"Shape of x after reshape is (batch_size x feature_num) {x.shape}")
         x = self.deconv1(x)
         x = self.deconv2(x)
         x = self.deconv3(x)

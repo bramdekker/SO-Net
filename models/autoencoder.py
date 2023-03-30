@@ -66,8 +66,8 @@ class Model():
         self.predicted_pc = self.decoder(self.feature)
 
         # Batch size: [[x0,..xn], [y0,...,yn], [z0,...,zn]]
-        print(f"Predicted point cloud: {self.predicted_pc}")
-        print(f"Predicted point cloud: {self.predicted_pc.cpu().detach().numpy().shape}")
+        # print(f"Predicted point cloud: {self.predicted_pc}")
+        # print(f"Predicted point cloud: {self.predicted_pc.cpu().detach().numpy().shape}")
 
         # my_data = input_pc.numpy()[0]
 		# # 1. Create a new header
