@@ -235,6 +235,7 @@ class UpConv(nn.Module):
 
     def forward(self, x):
         x = self.up_sample(x)
+        print(f"Shape of x after upsampling layer (2x2048x2x2?) is {x.shape}")
         x = self.conv(x)
 
         return x
