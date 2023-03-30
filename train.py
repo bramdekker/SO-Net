@@ -48,6 +48,9 @@ def plot_train_test_loss(epochs, train_loss, test_loss):
     plt.savefig(f'train_test_loss_{epochs}epochs')
     plt.show()
 
+def non_sharede_parameters(model):
+    return sum(dict((p.data_ptr(), p.numel()) for p in model.parameters()).values())
+
 def count_parameters(model):
     table = PrettyTable(["Modules", "Parameters"])
     total_params = 0
@@ -100,6 +103,7 @@ if __name__=='__main__':
 
     # ~270 million params (PointNet ~ 4M, MVCNN ~ 60M)
     model = Model(opt)
+    print(f"Number of non shared parameters: {non_sharede_parameters(model.decoder)}")
     count_parameters(model.decoder)
 
     pytorch_total_encoder_params = sum(p.numel() for p in model.encoder.parameters())
