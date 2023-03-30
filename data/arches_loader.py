@@ -184,6 +184,7 @@ class ArchesLoader(data.Dataset):
 
         # print("Just before downsampling")
         # Downsample to the number of input points specified in options.
+        # TODO: downsampling seems to not work correctly!
         if self.opt.input_pc_num < pc_np.shape[1]:
             # print(f"pc_np.shape: {pc_np.shape}")
             chosen_idx = np.random.choice(pc_np.shape[1], self.opt.input_pc_num, replace=False)

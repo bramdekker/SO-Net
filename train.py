@@ -135,6 +135,32 @@ if __name__=='__main__':
         train_loss = 0
         batch_amount = 0
         for i, data in enumerate(trainloader):
+            if i >= 3:
+                break
+
+            # Go over first 12 ~ 3 batches and just save original (downsampled) pc to check if correct!
+            input_pc, input_label, input_node, input_node_knn_I = data # pc, label, som_node, som_knn_I
+
+            for j, pc in enumerate(input_pc):
+                data_idx = (i * 4 + j) // 6
+                augment_idx = (i * 4 + j) % 6
+
+                header = laspy.LasHeader(point_format=6, version="1.4")
+                #header.offsets = np.min(my_data, axis=0)
+
+                # 2. Create a Las
+                las = laspy.LasData(header)
+
+                las.x = pc[0] # Array with all x coefficients. [x1, x2, ..., xn]
+                las.y = pc[1]
+                las.z = pc[2]
+                # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
+
+                las.write("original_pc_%d_%d.las" % (data_idx, augment_idx))
+
+            continue
+
+
             # print(f"Getting batch number {i}")
             iter_start_time = time.time()
             epoch_iter += opt.batch_size
