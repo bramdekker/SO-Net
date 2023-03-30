@@ -151,12 +151,12 @@ if __name__=='__main__':
                 # 2. Create a Las
                 las = laspy.LasData(header)
 
-                print(f"Original pc shape is {pc.shape}")
-                print(f"Pc first 10 is {pc[0][:10]}")
+                # print(f"Original pc shape is {pc.shape}")
+                # print(f"Pc first 10 is {pc[0][:10]}")
 
-                las.x = pc[0] # Array with all x coefficients. [x1, x2, ..., xn]
-                las.y = pc[1]
-                las.z = pc[2]
+                las.x = pc.numpy()[0] # Array with all x coefficients. [x1, x2, ..., xn]
+                las.y = pc.numpy()[1]
+                las.z = pc.numpy()[2]
                 # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
 
                 las.write("original_pc_%d_%d.las" % (data_idx, augment_idx))
