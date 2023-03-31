@@ -205,7 +205,7 @@ if __name__=='__main__':
             after_batch_mem = torch.cuda.memory_allocated(opt.device)
             print(f"Amount of GPU memory allocated in MB after batch training: {after_batch_mem / 1000000}")
 
-        if epoch == 9: # n_epochs - 1
+        if epoch == opt.epochs - 1:
             input_pred_dict = model.get_current_visuals()
             input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
             print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
