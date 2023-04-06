@@ -351,10 +351,16 @@ class DecoderLinear(nn.Module):
         self.feature_num = opt.feature_num
         self.output_point_number = opt.output_fc_pc_num
 
-        self.linear1 = MyLinear(self.feature_num, self.output_point_number*2, activation=self.opt.activation, normalization=self.opt.normalization)
-        self.linear2 = MyLinear(self.output_point_number*2, self.output_point_number*3, activation=self.opt.activation, normalization=self.opt.normalization)
-        self.linear3 = MyLinear(self.output_point_number*3, self.output_point_number*4, activation=self.opt.activation, normalization=self.opt.normalization)
-        self.linear_out = MyLinear(self.output_point_number*4, self.output_point_number*3, activation=None, normalization=None)
+        # Using feature_num instead of output_point_number
+        self.linear1 = MyLinear(self.feature_num, self.feature_num*2, activation=self.opt.activation, normalization=self.opt.normalization)
+        self.linear2 = MyLinear(self.feature_num*2, self.feature_num*3, activation=self.opt.activation, normalization=self.opt.normalization)
+        self.linear3 = MyLinear(self.feature_num*3, self.feature_num*4, activation=self.opt.activation, normalization=self.opt.normalization)
+        self.linear_out = MyLinear(self.feature_num*4, self.output_point_number*3, activation=None, normalization=None)
+
+        # self.linear1 = MyLinear(self.feature_num, self.output_point_number*2, activation=self.opt.activation, normalization=self.opt.normalization)
+        # self.linear2 = MyLinear(self.output_point_number*2, self.output_point_number*3, activation=self.opt.activation, normalization=self.opt.normalization)
+        # self.linear3 = MyLinear(self.output_point_number*3, self.output_point_number*4, activation=self.opt.activation, normalization=self.opt.normalization)
+        # self.linear_out = MyLinear(self.output_point_number*4, self.output_point_number*3, activation=None, normalization=None)
 
         # special initialization for linear_out, to get uniform distribution over the space
         self.linear_out.linear.bias.data.uniform_(-1, 1)
