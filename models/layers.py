@@ -234,11 +234,8 @@ class UpConv(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x):
-        print(f"Before Upsample input shape {list(x.shape)}")
         x = self.up_sample(x)
-        print(f"After Upsample input shape {list(x.shape)}")
         x = self.conv(x)
-        print(f"After conv input shape {list(x.shape)}")
 
         return x
 

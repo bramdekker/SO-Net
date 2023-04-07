@@ -202,9 +202,6 @@ if __name__=='__main__':
                 # visuals = model.get_current_visuals()
                 # visualizer.display_current_results(visuals, epoch, i)
 
-            after_batch_mem = torch.cuda.memory_allocated(opt.device)
-            print(f"Amount of GPU memory allocated in MB after batch training: {after_batch_mem / 1000000}")
-
         if epoch == opt.epochs - 1:
             input_pred_dict = model.get_current_visuals()
             input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
