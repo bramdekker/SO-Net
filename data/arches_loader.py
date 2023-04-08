@@ -174,7 +174,7 @@ class ArchesLoader(data.Dataset):
         # Data is like [[x1, x2, ..., xn], [y1, y2, ..., yn], [z1, z2, ..., zn]], so a 3xN array
         pc_np = data['pc']
 
-        # sn_np = data['sn']
+        sn_np = data['sn']
         # seg_np = data['part_label']
         som_node_np = data['som_node'] # 3 x 64
         # som_node_np = np.transpose(data['som_node']) #3x64
@@ -191,17 +191,17 @@ class ArchesLoader(data.Dataset):
             chosen_idx = np.random.choice(pc_np.shape[1], self.opt.input_pc_num, replace=False)
             # pc_np = pc_np[chosen_idx, :]
             pc_np = pc_np[:, chosen_idx]
-            # sn_np = sn_np[chosen_idx, :]
+            sn_np = sn_np[:, chosen_idx]
             # seg_np = seg_np[chosen_idx]
         else:
             # print(f"In else: pc_np.shape: {pc_np.shape}")
             chosen_idx = np.random.choice(pc_np.shape[1], self.opt.input_pc_num-pc_np.shape[1], replace=True)
             # pc_np_redundent = pc_np[chosen_idx, :]
             pc_np_redundent = pc_np[:, chosen_idx]
-            # sn_np_redundent = sn_np[chosen_idx, :]
+            sn_np_redundent = sn_np[: chosen_idx]
             # seg_np_redundent = seg_np[chosen_idx]
             pc_np = np.concatenate((pc_np, pc_np_redundent), axis=0) # Ux3 concat Vx3 -> Nx3
-            # sn_np = np.concatenate((sn_np, sn_np_redundent), axis=0)
+            sn_np = np.concatenate((sn_np, sn_np_redundent), axis=0)
             # seg_np = np.concatenate((seg_np, seg_np_redundent), axis=0)
 
         # print(f"Shape just before augmentation is {pc_np.shape}")
@@ -214,6 +214,7 @@ class ArchesLoader(data.Dataset):
             if augmentation_idx >= 3:
                 # print("Adding random noise")
                 pc_np = random_noise(pc_np, -self.noise_value, self.noise_value)
+                sn_np = random_noise(sn_np, -self.noise_value, self.noise_value)
                 som_node_np = random_noise(som_node_np, -self.noise_value, self.noise_value)
                 # print("After adding random noise")
                 # print(f"pc_np.shape: {pc_np.shape}")
@@ -228,6 +229,7 @@ class ArchesLoader(data.Dataset):
             if rotation_angle != 0:
                 # print("Rotating point cloud")
                 pc_np = rotate_point_cloud(pc_np, rotation_angle)
+                sn_np = rotate_point_cloud(sn_np, rotation_angle)
                 som_node_np = rotate_point_cloud(som_node_np, rotation_angle)
                 # print("After rotating point cloud")
 
@@ -250,7 +252,7 @@ class ArchesLoader(data.Dataset):
             # random scale
             scale = np.random.uniform(low=0.9, high=1.1)
             pc_np = pc_np * scale
-            # sn_np = sn_np * scale
+            sn_np = sn_np * scale
             som_node_np = som_node_np * scale
             # print("After scaling point cloud")
 
@@ -261,7 +263,7 @@ class ArchesLoader(data.Dataset):
 
         # convert to tensor
         pc = torch.from_numpy(pc_np.astype(np.float32))  # 3xN
-        # sn = torch.from_numpy(sn_np.transpose().astype(np.float32))  # 3xN
+        sn = torch.from_numpy(sn_np.astype(np.float32))  # 3xN
         # seg = torch.from_numpy(seg_np.astype(np.int64))  # N
 
         # som
@@ -281,7 +283,7 @@ class ArchesLoader(data.Dataset):
 
         # print(f"Final shape of pc is {pc.shape}. Index is {augmentation_idx}")
 
-        return pc, label, som_node, som_knn_I
+        return pc, sn, label, som_node, som_knn_I
 
 
 

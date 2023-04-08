@@ -171,8 +171,8 @@ if __name__=='__main__':
                 model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
             elif opt.dataset=='shapenet' or opt.dataset=='catenary_arches':
                 # print('Going to unpack the data of a single batch')
-                input_pc, input_label, input_node, input_node_knn_I = data # pc, label, som_node, som_knn_I
-                model.set_input(input_pc, input_label, input_node, input_node_knn_I)
+                input_pc, input_sn, input_label, input_node, input_node_knn_I = data # pc, label, som_node, som_knn_I
+                model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
                 after_loading_input_mem = torch.cuda.memory_allocated(opt.device)
                 print(f"Amount of GPU memory allocated in MB after loading input: {after_loading_input_mem / 1000000}")
 
