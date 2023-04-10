@@ -29,8 +29,8 @@ def som_saver_catenary_arches(root, rows, cols, gpu_ids, output_root):
 
         # Downsample point cloud to take 524288 random points.
         print(f"PC_np shape[0] is thus {pc_np.shape[0]}")
-        pc_sampled = pc_np[:, np.random.choice(pc_np.shape[0], 524288, replace=False)] # 3 x sample_size
-        pc = torch.from_numpy(pc_np).cuda()
+        pc_sampled = pc_np[:, np.random.choice(pc_np.shape[1], 524288, replace=False)] # 3 x sample_size
+        pc = torch.from_numpy(pc_sampled).cuda()
 
         # Train SOM
         som_builder.optimize(pc)
