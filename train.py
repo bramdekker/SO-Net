@@ -260,8 +260,8 @@ if __name__=='__main__':
                         input_pc, input_sn, input_label, input_node, input_node_knn_I = data
                         model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
                     elif opt.dataset == 'shapenet' or 'catenary_arches':
-                        input_pc, input_label, input_node, input_node_knn_I = data
-                        model.set_input(input_pc, input_label, input_node, input_node_knn_I)
+                        input_pc, input_sn, input_label, input_node, input_node_knn_I = data
+                        model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
                     model.test_model()
 
                     batch_amount += input_label.size()[0]
