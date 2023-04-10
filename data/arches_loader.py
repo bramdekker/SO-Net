@@ -166,7 +166,7 @@ class ArchesLoader(data.Dataset):
             # print(f"Dataset index is (0-3): {dataset_idx}")
         file = self.dataset[dataset_idx][0:-4]
         # print(f"Just before np load of npz file {file}")
-        data = np.load(os.path.join(self.root, '%dx%d' % (self.rows, self.cols), file + '.npz'))
+        data = np.load(os.path.join(self.root, '%dx%d' % (self.rows, self.cols), file + '_sn.npz'))
 
         # Data is like [[x1, y1, z1], [x2, y2, z2], ..., [xn, yn, zn]], so a Nx3 array
         # pc_np = np.transpose(data['pc'])
