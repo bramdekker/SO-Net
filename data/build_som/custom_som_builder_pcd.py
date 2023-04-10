@@ -37,7 +37,7 @@ def som_saver_catenary_arches(root, rows, cols, gpu_ids, output_root):
         som_node_np = som_builder.node.cpu().numpy().astype(np.float32)  # 3 x node_num
         
         # Save file as npz
-        npz_file = os.path.join(output_root, f[0:-4]+'_sn.npz')
+        npz_file = os.path.join(output_root, f[0:-4]+'.npz')
         np.savez(npz_file, pc=pc_np, sn=sn_np, som_node=som_node_np) # sn = surface normal
 
 if __name__ == "__main__":
