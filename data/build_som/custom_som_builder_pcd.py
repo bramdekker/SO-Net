@@ -20,14 +20,17 @@ def som_saver_catenary_arches(root, rows, cols, gpu_ids, output_root):
         # f_las = laspy.read(os.path.join(root, f))
         f_pcd = o3d.io.read_point_cloud(os.path.join(root, f))
         pc_np = np.asarray(f_pcd.points) # 3xN tensor -> [[x0, ..., xn], [y0, ..., yn, [z0, ..., zn]]]
+        print(f"Pc_np is like this: {pc_np[:10]}")
         # pc_np = np.vstack((f_las.x, f_las.y, f_las.z)) # 3xN tensor -> [[x0, ..., xn], [y0, ..., yn, [z0, ..., zn]]]
         # pc_np = np.transpose(pc_np) # Nx3 array -> [[x0, y0, z0], ..., [xn, yn, zn]]
 
         sn_np = np.asarray(f_pcd.normals)
+        print(f"Sn_np is like this: {sn_np[:10]}")
 
         # Downsample point cloud to take 524288 random points.
+        print(f"PC_np shape[0] is thus {pc_np.shape[0]}")
         pc_sampled = pc_np[:, np.random.choice(pc_np.shape[0], 524288, replace=False)] # 3 x sample_size
-        pc = torch.from_numpy(pc_sampled).cuda()
+        pc = torch.from_numpy(pc_np).cuda()
 
         # Train SOM
         som_builder.optimize(pc)
