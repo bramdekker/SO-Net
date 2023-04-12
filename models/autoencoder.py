@@ -109,8 +109,10 @@ class Model():
 
         if self.opt.output_conv_pc_num > 0:
             # loss for second last conv pyramid # 32x32
+            print("Just before self.loss_chamfer_conv5")
             self.loss_chamfer_conv5 = self.chamfer_criteria(self.decoder.conv_pc5, self.pc)
-
+            
+            print("Just before self.loss_chamfer_conv4")
             # loss for third last conv pyramid # 16x16
             self.loss_chamfer_conv4 = self.chamfer_criteria(self.decoder.conv_pc4, self.pc)
 
