@@ -95,11 +95,16 @@ class Model():
             self.pc = torch.index_select(self.pc, dim=2, index=chosen_indices_tensor)
             self.sn = torch.index_select(self.sn, dim=2, index=chosen_indices_tensor)
 
+        print("Just before encpder train")
         self.encoder.train()
+        print("Just before decoder train")
         self.decoder.train()
+        print("Just before self forward")
         self.forward(is_train=True, epoch=epoch)
 
+        print("Just before encoder zero_grad")
         self.encoder.zero_grad()
+        print("Just before decoder zero_grad")
         self.decoder.zero_grad()
 
         if self.opt.output_conv_pc_num > 0:
@@ -110,20 +115,24 @@ class Model():
             self.loss_chamfer_conv4 = self.chamfer_criteria(self.decoder.conv_pc4, self.pc)
 
         # loss for the last pyramid, i.e., the final pc
+        print("Just before self.loss_chamfer")
         self.loss_chamfer = self.chamfer_criteria(self.predicted_pc, self.pc)
 
         if self.opt.output_conv_pc_num == 1024:
             self.loss = self.loss_chamfer + self.loss_chamfer_conv4
         elif self.opt.output_conv_pc_num == 4096:
+            print("Just before self.loss assignment")
             self.loss = self.loss_chamfer + self.loss_chamfer_conv5 + self.loss_chamfer_conv4
         else:
             self.loss = self.loss_chamfer
 
         # self.train_loss = self.loss.item().cpu()
-
+        print("Just before loss.backward")
         self.loss.backward()
 
+        print("Just before optimizer_encoder.step")
         self.optimizer_encoder.step()
+        print("Just before optimizer_decoder.step")
         self.optimizer_decoder.step()
 
     def test_model(self):
