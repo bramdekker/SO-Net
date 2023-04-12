@@ -102,7 +102,7 @@ if __name__=='__main__':
         raise Exception('Dataset error.')
 
     # ~270 million params (PointNet ~ 4M, MVCNN ~ 60M)
-    model = Model(opt)
+    model = Model(opt) #.to(device)?
     count_parameters(model.decoder.conv_decoder.deconv1.conv)
     count_parameters(model.decoder.conv_decoder.deconv1.up_sample)
 
@@ -178,12 +178,14 @@ if __name__=='__main__':
 
             batch_amount += input_label.size()[0]
             # print(f"Input label.size()[0] is {input_label.size()[0]} ")
-            # print('About to optimize the model based on current training batch')
+            print('About to optimize the model based on current training batch')
             model.optimize()
-            # print('After optimizing the model based on current training batch')
+            print('After optimizing the model based on current training batch')
 
 
             train_loss += model.loss.cpu().data * input_label.size()[0]
+
+            print("After added training loss")
 
             # if i % 10 == 0:
                 # print/plot errors
@@ -284,6 +286,45 @@ if __name__=='__main__':
                 # if model.test_loss.item() < best_loss:
                 #     best_loss = model.test_loss.item()
                 print('Tested network. So far lowest loss: %f' % best_loss)
+            
+                # Save predictions and originals inputs of the testset.
+                if epoch == opt.epochs - 1:
+                    input_pred_dict = model.get_current_visuals()
+                    input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
+                    print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
+
+                    for i in range(len(input_pc)):
+                        # Save original point cloud.
+                        input_data = input_pc[i]
+                        # 1. Create a new header
+                        header = laspy.LasHeader(point_format=6, version="1.4")
+                        #header.offsets = np.min(my_data, axis=0)
+
+                        # 2. Create a Las
+                        las = laspy.LasData(header)
+
+                        las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+                        las.y = input_data[1]
+                        las.z = input_data[2]
+                        # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
+
+                        las.write("original_pc_%d.las" % i)
+
+                        # Save predicted point cloud.
+                        predicted_data = predicted_pc[i]
+                        # 1. Create a new header
+                        header = laspy.LasHeader(point_format=6, version="1.4")
+                        #header.offsets = np.min(my_data, axis=0)
+
+                        # 2. Create a Las
+                        las2 = laspy.LasData(header)
+
+                        las2.x = predicted_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+                        las2.y = predicted_data[1]
+                        las2.z = predicted_data[2]
+                        # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
+
+                        las2.write("predicted_pc_%d.las" % i)
 
         end_test = time.time()
         print(f"Testing after epoch {epoch} took {end_test-end_train} seconds.")
