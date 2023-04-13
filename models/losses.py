@@ -280,6 +280,7 @@ class ChamferLoss(nn.Module):
 
             # process nearest k neighbors
             for k in range(self.k):
+                print(f"Shape of ground truth point cloud: {gt_pc[i].shape}, selected index: 1, {I_var[:, k]}")
                 selected_gt_by_predict[i,k,...] = gt_pc[i].index_select(1, I_var[:,k])
 
             # database is predict_pc, gt_pc -> predict_pc -------------------------------------------------------
