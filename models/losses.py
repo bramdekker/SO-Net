@@ -197,7 +197,7 @@ class ChamferLoss(nn.Module):
 
         # we need only a StandardGpuResources per GPU
         self.res = faiss.StandardGpuResources()
-        self.res.setTempMemory(1500 * 1024 * 1024)
+        # self.res.setTempMemory(1500 * 1024 * 1024)
         self.flat_config = faiss.GpuIndexFlatConfig()
         self.flat_config.device = opt.gpu_id
 
@@ -212,11 +212,11 @@ class ChamferLoss(nn.Module):
         '''
         # index = faiss.GpuIndexFlatL2(self.res, self.dimension, self.flat_config)  # dimension is 3
         index_cpu = faiss.IndexFlatL2(self.dimension)
-        print("After getting cpu index from faiss")
+        print(f"After getting cpu index from faiss. Index_cpu: {index_cpu}")
         index = faiss.index_cpu_to_gpu(self.res, self.opt.gpu_id, index_cpu)
-        print("After getting index from faiss")
+        print(f"After getting index from faiss. Index: {index}")
         index.add(database)
-        print("After adding database to index")
+        print(f"After adding database to index. Database: {database}")
         return index
 
     def search_nn(self, index, query, k):
@@ -249,6 +249,7 @@ class ChamferLoss(nn.Module):
         print("Just before predict_pc_np with torch.transpose")
         predict_pc_np = np.ascontiguousarray(torch.transpose(predict_pc.data.clone(), 1, 2).cpu().numpy())  # BxMx3
         print("Just after the first torch.transpose")
+        print(f"Shape of predict_pc_np is {predict_pc_np.shape} (8x(M=64)x3)")
         gt_pc_np = np.ascontiguousarray(torch.transpose(gt_pc.data.clone(), 1, 2).cpu().numpy())  # BxNx3
         print("Just after the second torch.transpose for gt_pc_np")
 
@@ -270,8 +271,12 @@ class ChamferLoss(nn.Module):
             index_predict = self.build_nn_index(predict_pc_np[i])
             index_gt = self.build_nn_index(gt_pc_np[i])
 
+            print("After building nn indices")
+
             # database is gt_pc, predict_pc -> gt_pc -----------------------------------------------------------
             _, I_var = self.search_nn(index_gt, predict_pc_np[i], self.k)
+
+            print("After search nn on index_gt and predict_pc_np[i]")
 
             # process nearest k neighbors
             for k in range(self.k):
@@ -279,6 +284,8 @@ class ChamferLoss(nn.Module):
 
             # database is predict_pc, gt_pc -> predict_pc -------------------------------------------------------
             _, I_var = self.search_nn(index_predict, gt_pc_np[i], self.k)
+
+            print("After search nn on index_predict and gt_pc_np[i]")
 
             # process nearest k neighbors
             for k in range(self.k):
