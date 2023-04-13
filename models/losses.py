@@ -210,10 +210,10 @@ class ChamferLoss(nn.Module):
         :param database: numpy array of Nx3
         :return: Faiss index, in CPU
         '''
-        # index = faiss.GpuIndexFlatL2(self.res, self.dimension, self.flat_config)  # dimension is 3
-        index_cpu = faiss.IndexFlatL2(self.dimension)
+        index = faiss.GpuIndexFlatL2(self.res, self.dimension, self.flat_config)  # dimension is 3
+        # index_cpu = faiss.IndexFlatL2(self.dimension)
         print("After getting cpu index from faiss")
-        index = faiss.index_cpu_to_gpu(self.res, self.opt.gpu_id, index_cpu)
+        # index = faiss.index_cpu_to_gpu(self.res, self.opt.gpu_id, index_cpu)
         print("After getting index from faiss")
         index.add(database)
         print("After adding database to index")
