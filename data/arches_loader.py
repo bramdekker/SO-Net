@@ -271,8 +271,7 @@ class ArchesLoader(data.Dataset):
 
         # convert to tensor
         pc = torch.from_numpy(pc_np.astype(np.float32))  # 3xN
-        if self.opt.surface_normal:
-            sn = torch.from_numpy(sn_np.astype(np.float32))  # 3xN
+        sn = torch.from_numpy(sn_np.astype(np.float32))  # 3xN
         # seg = torch.from_numpy(seg_np.astype(np.int64))  # N
 
         # som
