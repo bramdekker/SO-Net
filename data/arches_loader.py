@@ -187,26 +187,23 @@ class ArchesLoader(data.Dataset):
         # assert(label >= 0)
 
         # print("Just before downsampling")
-        # Downsample to the number of input points specified in options.
+        # Downsample to the number of input points specified in options. Also sn when not used!
         if self.opt.input_pc_num < pc_np.shape[1]:
             # print(f"pc_np.shape: {pc_np.shape}")
             chosen_idx = np.random.choice(pc_np.shape[1], self.opt.input_pc_num, replace=False)
             # pc_np = pc_np[chosen_idx, :]
             pc_np = pc_np[:, chosen_idx]
-            if self.opt.surface_normal:
-                sn_np = sn_np[:, chosen_idx]
+            sn_np = sn_np[:, chosen_idx]
             # seg_np = seg_np[chosen_idx]
         else:
             # print(f"In else: pc_np.shape: {pc_np.shape}")
             chosen_idx = np.random.choice(pc_np.shape[1], self.opt.input_pc_num-pc_np.shape[1], replace=True)
             # pc_np_redundent = pc_np[chosen_idx, :]
             pc_np_redundent = pc_np[:, chosen_idx]
-            if self.opt.surface_normal:
-                sn_np_redundent = sn_np[: chosen_idx]
+            sn_np_redundent = sn_np[: chosen_idx]
             # seg_np_redundent = seg_np[chosen_idx]
             pc_np = np.concatenate((pc_np, pc_np_redundent), axis=0) # Ux3 concat Vx3 -> Nx3
-            if self.opt.surface_normal:
-                sn_np = np.concatenate((sn_np, sn_np_redundent), axis=0)
+            sn_np = np.concatenate((sn_np, sn_np_redundent), axis=0)
             # seg_np = np.concatenate((seg_np, seg_np_redundent), axis=0)
 
         # print(f"Shape just before augmentation is {pc_np.shape}")
