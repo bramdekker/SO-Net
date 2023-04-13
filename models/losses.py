@@ -1,10 +1,10 @@
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
+# from torch.autograd import Variable
 import numpy as np
-import math
-import torch.utils.model_zoo as model_zoo
-import time
+# import math
+# import torch.utils.model_zoo as model_zoo
+# import time
 import torch.nn.functional as F
 import faiss
 
@@ -243,8 +243,11 @@ class ChamferLoss(nn.Module):
         predict_pc_size = predict_pc.size()
         gt_pc_size = gt_pc.size()
 
+        print("Just before predict_pc_np with torch.transpose")
         predict_pc_np = np.ascontiguousarray(torch.transpose(predict_pc.data.clone(), 1, 2).cpu().numpy())  # BxMx3
+        print("Just after the first torch.transpose")
         gt_pc_np = np.ascontiguousarray(torch.transpose(gt_pc.data.clone(), 1, 2).cpu().numpy())  # BxNx3
+        print("Just after the second torch.transpose for gt_pc_np")
 
         # selected_gt: Bxkx3xM
         selected_gt_by_predict = torch.FloatTensor(predict_pc_size[0], self.k, predict_pc_size[1], predict_pc_size[2])
