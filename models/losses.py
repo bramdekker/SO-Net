@@ -254,9 +254,13 @@ class ChamferLoss(nn.Module):
         # selected_predict: Bxkx3xN
         selected_predict_by_gt = torch.FloatTensor(gt_pc_size[0], self.k, gt_pc_size[1], gt_pc_size[2])
 
+        print("After making FloatTensor from them")
+
         if self.opt.gpu_id >= 0:
             selected_gt_by_predict = selected_gt_by_predict.to(self.opt.device)
             selected_predict_by_gt = selected_predict_by_gt.to(self.opt.device)
+
+        print("After putting tensor to gpu")
 
         # process each batch independently.
         for i in range(predict_pc_np.shape[0]):
@@ -277,16 +281,22 @@ class ChamferLoss(nn.Module):
             for k in range(self.k):
                 selected_predict_by_gt[i,k,...] = predict_pc[i].index_select(1, I_var[:,k])
 
+        print("After for-loop over predict_pc_np.shape[0]")
+
         # compute loss ===================================================
         # selected_gt(Bxkx3xM) vs predict_pc(Bx3xM)
         forward_loss_element = robust_norm(selected_gt_by_predict-predict_pc.unsqueeze(1).expand_as(selected_gt_by_predict))
         self.forward_loss = forward_loss_element.mean()
         self.forward_loss_array = forward_loss_element.mean(dim=1).mean(dim=1)
 
+        print("After computing loss")
+
         # selected_predict(Bxkx3xN) vs gt_pc(Bx3xN)
         backward_loss_element = robust_norm(selected_predict_by_gt - gt_pc.unsqueeze(1).expand_as(selected_predict_by_gt))  # BxkxN
         self.backward_loss = backward_loss_element.mean()
         self.backward_loss_array = backward_loss_element.mean(dim=1).mean(dim=1)
+
+        print("After backward loss calculation")
 
         self.loss_array = self.forward_loss_array + self.backward_loss_array
         return self.forward_loss + self.backward_loss # + self.sparsity_loss
@@ -294,5 +304,6 @@ class ChamferLoss(nn.Module):
     def __call__(self, predict_pc, gt_pc):
         # start_time = time.time()
         loss = self.forward(predict_pc, gt_pc)
+        print("After calculating the Chamfer loss")
         # print(time.time()-start_time)
         return loss
