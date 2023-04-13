@@ -55,7 +55,7 @@ class Options():
             self.initialize()
         self.opt = self.parser.parse_args()
 
-        self.opt.device = "cpu"
+        self.opt.device = torch.device("cpu")
         if self.opt.gpu_id >= 0 and torch.cuda.is_available():
             self.opt.device = torch.device("cuda:%d" % (self.opt.gpu_id))
 

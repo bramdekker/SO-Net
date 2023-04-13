@@ -249,7 +249,7 @@ class ChamferLoss(nn.Module):
         print("Just before predict_pc_np with torch.transpose")
         predict_pc_np = np.ascontiguousarray(torch.transpose(predict_pc.data.clone(), 1, 2).cpu().numpy())  # BxMx3
         print("Just after the first torch.transpose")
-        print(f"Shape of predict_pc_np is {predict_pc_np.shape} (8x(M=64)x3)")
+        print(f"Shape of predict_pc_np is {predict_pc_np.shape} (2x(M=128)x3)")
         gt_pc_np = np.ascontiguousarray(torch.transpose(gt_pc.data.clone(), 1, 2).cpu().numpy())  # BxNx3
         print("Just after the second torch.transpose for gt_pc_np")
 
@@ -280,7 +280,7 @@ class ChamferLoss(nn.Module):
 
             # process nearest k neighbors
             for k in range(self.k):
-                print(f"Shape of ground truth point cloud: {gt_pc[i].shape}, selected index: 1, {I_var[:, k]}")
+                print(f"Shape of ground truth point cloud: {gt_pc[i].shape}, selected index: 1, {I_var[:, k].shape}")
                 selected_gt_by_predict[i,k,...] = gt_pc[i].index_select(1, I_var[:,k])
 
             # database is predict_pc, gt_pc -> predict_pc -------------------------------------------------------

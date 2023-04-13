@@ -184,8 +184,11 @@ class BatchSOM():
         self.max_iteration = 60
 
         self.gpu_id = gpu_id
-        assert gpu_id >= 0
-        self.device = torch.device("cuda:%d"%(gpu_id) if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cpu")
+
+        if gpu_id >= 0 and torch.cuda.is_available():
+        # assert gpu_id >= 0
+            self.device = torch.device("cuda:%d"%(gpu_id))
         self.batch_size = batch_size
 
         # node: BxCx(rowsxcols), tensor
