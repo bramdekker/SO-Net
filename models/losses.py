@@ -212,8 +212,11 @@ class ChamferLoss(nn.Module):
         '''
         # index = faiss.GpuIndexFlatL2(self.res, self.dimension, self.flat_config)  # dimension is 3
         index_cpu = faiss.IndexFlatL2(self.dimension)
+        print("After getting cpu index from faiss")
         index = faiss.index_cpu_to_gpu(self.res, self.opt.gpu_id, index_cpu)
+        print("After getting index from faiss")
         index.add(database)
+        print("After adding database to index")
         return index
 
     def search_nn(self, index, query, k):
