@@ -204,43 +204,44 @@ if __name__=='__main__':
                 # visuals = model.get_current_visuals()
                 # visualizer.display_current_results(visuals, epoch, i)
 
-        if epoch == opt.epochs - 1:
-            input_pred_dict = model.get_current_visuals()
-            input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
-            print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
+            # Save original and reconstructed point cloud of 1st batch of last epoch to files.
+            if epoch == opt.epochs - 1 and i == 0:
+                input_pred_dict = model.get_current_visuals()
+                input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
+                print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
 
-            for i in range(len(input_pc)):
-                # Save original point cloud.
-                input_data = input_pc[i]
-                # 1. Create a new header
-                header = laspy.LasHeader(point_format=6, version="1.4")
-                #header.offsets = np.min(my_data, axis=0)
+                for i in range(len(input_pc)):
+                    # Save original point cloud.
+                    input_data = input_pc[i]
+                    # 1. Create a new header
+                    header = laspy.LasHeader(point_format=6, version="1.4")
+                    #header.offsets = np.min(my_data, axis=0)
 
-                # 2. Create a Las
-                las = laspy.LasData(header)
+                    # 2. Create a Las
+                    las = laspy.LasData(header)
 
-                las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
-                las.y = input_data[1]
-                las.z = input_data[2]
-                # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
+                    las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+                    las.y = input_data[1]
+                    las.z = input_data[2]
+                    # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
 
-                las.write("original_pc_%d.las" % i)
+                    las.write("original_pc_%d.las" % i)
 
-                # Save predicted point cloud.
-                predicted_data = predicted_pc[i]
-                # 1. Create a new header
-                header = laspy.LasHeader(point_format=6, version="1.4")
-                #header.offsets = np.min(my_data, axis=0)
+                    # Save predicted point cloud.
+                    predicted_data = predicted_pc[i]
+                    # 1. Create a new header
+                    header = laspy.LasHeader(point_format=6, version="1.4")
+                    #header.offsets = np.min(my_data, axis=0)
 
-                # 2. Create a Las
-                las2 = laspy.LasData(header)
+                    # 2. Create a Las
+                    las2 = laspy.LasData(header)
 
-                las2.x = predicted_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
-                las2.y = predicted_data[1]
-                las2.z = predicted_data[2]
-                # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
+                    las2.x = predicted_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+                    las2.y = predicted_data[1]
+                    las2.z = predicted_data[2]
+                    # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
 
-                las2.write("predicted_pc_%d.las" % i)
+                    las2.write("predicted_pc_%d.las" % i)
 
 
         train_loss /= batch_amount
