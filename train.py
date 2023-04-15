@@ -178,14 +178,14 @@ if __name__=='__main__':
 
             batch_amount += input_label.size()[0]
             # print(f"Input label.size()[0] is {input_label.size()[0]} ")
-            print('About to optimize the model based on current training batch')
+            # print('About to optimize the model based on current training batch')
             model.optimize()
-            print('After optimizing the model based on current training batch')
+            # print('After optimizing the model based on current training batch')
 
 
             train_loss += model.loss.cpu().data * input_label.size()[0]
 
-            print("After added training loss")
+            # print("After added training loss")
 
             # if i % 10 == 0:
                 # print/plot errors
