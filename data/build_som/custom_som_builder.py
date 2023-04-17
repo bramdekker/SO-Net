@@ -35,7 +35,8 @@ def som_saver_catenary_arches(root, rows, cols, gpu_ids, output_root):
         np.savez(npz_file, pc=pc_np, som_node=som_node_np) # sn = surface normal
 
 if __name__ == "__main__":
-    rows, cols = 8, 8
+    rows, cols = 4, 4
+    # rows, cols = 8, 8
     if len(sys.argv) == 3:
         rows, cols = sys.argv[1], sys.argv[2]
 
