@@ -46,11 +46,19 @@ def make_dataset_shapenet_normal(root, mode):
 
 # Hardcode the files for ease.
 def make_dataset_arches(root, mode):
+    file_name_list = []
+
     if mode == 'train':
         # file_name_list = ["01_01.laz", "01_02.laz", "01_03.laz", "02_01.laz", "02_02.laz", "02_03.laz", "02_04.laz", "03_01.laz", "03_02.laz", "03_03.laz", "03_04.laz"]
-        file_name_list = ["01_01_norm.laz", "01_02_norm.laz", "01_03_norm.laz", "02_01_norm.laz", "02_02_norm.laz", "02_03_norm.laz", "02_04_norm.laz", "03_01_norm.laz", "03_02_norm.laz", "03_03_norm.laz", "03_04_norm.laz"]
+        # file_name_list = ["01_01_norm.laz", "01_02_norm.laz", "01_03_norm.laz", "02_01_norm.laz", "02_02_norm.laz", "02_03_norm.laz", "02_04_norm.laz", "03_01_norm.laz", "03_02_norm.laz", "03_03_norm.laz", "03_04_norm.laz"]
+        for f in os.listdir(root):
+            if f.startswith("01") or f.startswith("02") or f.startswith("03"):
+                file_name_list.append(f)
     elif mode == 'test':
-        file_name_list = ["04_01_norm.laz", "04_02_norm.laz", "04_03_norm.laz", "04_04_norm.laz"]
+        for f in os.listdir(root):
+            if f.startswith("04"):
+                file_name_list.append(f)
+        # file_name_list = ["04_01_norm.laz", "04_02_norm.laz", "04_03_norm.laz", "04_04_norm.laz"]
 
         # file_name_list = ["01_01.laz", "01_02.laz", "01_03.laz", "02_01.laz", "02_02.laz", "02_03.laz", "02_04.laz", "03_01.laz", "03_02.laz", "03_03.laz", "03_04.laz"]
     else:
