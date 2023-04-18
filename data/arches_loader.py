@@ -185,7 +185,7 @@ class ArchesLoader(data.Dataset):
         # Data is like [[x1, x2, ..., xn], [y1, y2, ..., yn], [z1, z2, ..., zn]], so a 3xN array
         pc_np = data['pc']
         sn_np = np.ones_like(pc_np)
-        print(f"Type of sn_np is {type(sn_np)}")
+        # print(f"Type of sn_np is {type(sn_np)}")
 
         if self.opt.surface_normal:
             sn_np = data['sn']
@@ -212,11 +212,11 @@ class ArchesLoader(data.Dataset):
             chosen_idx = np.random.choice(pc_np.shape[1], self.opt.input_pc_num-pc_np.shape[1], replace=True)
             # pc_np_redundent = pc_np[chosen_idx, :]
             pc_np_redundent = pc_np[:, chosen_idx]
-            print(f"The type of sn_np is {type(sn_np)}")
+            # print(f"The type of sn_np is {type(sn_np)}")
             sn_np_redundent = sn_np[:, chosen_idx]
             # seg_np_redundent = seg_np[chosen_idx]
-            pc_np = np.concatenate((pc_np, pc_np_redundent), axis=0) # Ux3 concat Vx3 -> Nx3
-            sn_np = np.concatenate((sn_np, sn_np_redundent), axis=0)
+            pc_np = np.concatenate((pc_np, pc_np_redundent), axis=1) # Ux3 concat Vx3 -> Nx3
+            sn_np = np.concatenate((sn_np, sn_np_redundent), axis=1)
             # seg_np = np.concatenate((seg_np, seg_np_redundent), axis=0)
 
         # print(f"Shape just before augmentation is {pc_np.shape}")
