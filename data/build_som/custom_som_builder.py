@@ -28,7 +28,7 @@ def som_saver_catenary_arches(root, rows, cols, gpu_ids, output_root):
         # Train SOM
         som_builder.optimize(pc) # SOM expects a 3xN array ([x0 .. xn], [y0 .. yn], [z0 .. zn]]
         som_node_np = som_builder.node.cpu().numpy().astype(np.float32)  # 3 x node_num
-        print(som_node_np.shape)
+        # print(som_node_np.shape)
         
         # Save file as npz
         npz_file = os.path.join(output_root, f[0:-4]+'.npz')
