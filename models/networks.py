@@ -128,7 +128,7 @@ class Encoder(nn.Module):
         mask_row_sum = torch.sum(self.mask, dim=1)  # Bxnode_num
         mask = self.mask.unsqueeze(1)  # Bx1xkNxnode_num
 
-        # if necessary, stack the x
+        # if necessary, stack the x (to get k points for every x, whereby k nearest neighbours are subtracted from x)
         x_list, sn_list = [], []
         for i in range(self.opt.k):
             x_list.append(x)

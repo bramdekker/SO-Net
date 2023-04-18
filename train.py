@@ -263,8 +263,13 @@ if __name__=='__main__':
                         input_pc, input_sn, input_label, input_node, input_node_knn_I = data
                         model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
                     elif opt.dataset == 'shapenet' or 'catenary_arches':
-                        input_pc, input_sn, input_label, input_node, input_node_knn_I = data
-                        model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
+                        if opt.surface_normal:
+                            input_pc, input_sn, input_label, input_node, input_node_knn_I = data
+                            model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
+                        else:
+                            input_pc, input_label, input_node, input_node_knn_I = data
+                            input_sn = torch.from_numpy(np.ones(input_pc.shape)) # Set dummy surface normals of 1
+                            model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
                     model.test_model()
 
                     batch_amount += input_label.size()[0]

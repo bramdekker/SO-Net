@@ -26,7 +26,7 @@ def som_saver_catenary_arches(root, rows, cols, gpu_ids, output_root):
         pc = torch.from_numpy(pc_sampled).cuda()
 
         # Train SOM
-        som_builder.optimize(pc)
+        som_builder.optimize(pc) # SOM expects a 3xN array ([x0 .. xn], [y0 .. yn], [z0 .. zn]]
         som_node_np = som_builder.node.cpu().numpy().astype(np.float32)  # 3 x node_num
         print(som_node_np.shape)
         
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 3:
         rows, cols = sys.argv[1], sys.argv[2]
 
-    som_saver_catenary_arches('/home/jovyan/catenary-data-norm', rows, cols, 0, '/home/jovyan/catenary-data-norm/%dx%d'%(rows,cols))
+    som_saver_catenary_arches('/home/jovyan/catenary_data-_boxes_3_3_3_norm', rows, cols, 0, '/home/jovyan/catenary_data_boxes_3_3_3_norm/%dx%d'%(rows,cols))
 
 
     # if file[-3:] == 'txt':
