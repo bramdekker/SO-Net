@@ -166,12 +166,15 @@ class SOM():
 
     def optimize(self, x):
         self.node_init()
-        # print(f"Init node is {self.node[:10]}")
+        print(f"Init node is {self.node[0][0]}")
         # Print node and weightingmatrix value.
         for iter in range(int(self.max_iteration / 3)):
             self.batch_update(x, 0)
+            print(f"After batch update {iter} the node is now: {self.node[0][0]}")
         for iter in range(self.max_iteration):
             self.batch_update(x, iter)
+            print(f"After batch update {iter + int(self.max_iteration / 3)} the node is now: {self.node[0][0]}")
+
 
 
 class BatchSOM():
