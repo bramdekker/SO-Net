@@ -40,7 +40,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 3:
         rows, cols = sys.argv[1], sys.argv[2]
 
-    som_saver_catenary_arches('/home/jovyan/catenary_data-_boxes_3_3_3_norm', rows, cols, 0, '/home/jovyan/catenary_data_boxes_3_3_3_norm/%dx%d'%(rows,cols))
+    som_saver_catenary_arches('/home/jovyan/catenary_data_boxes_3_3_3_norm', rows, cols, 0, '/home/jovyan/catenary_data_boxes_3_3_3_norm/%dx%d'%(rows,cols))
 
 
     # if file[-3:] == 'txt':
