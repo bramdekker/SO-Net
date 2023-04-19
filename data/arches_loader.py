@@ -45,10 +45,16 @@ def make_dataset_shapenet_normal(root, mode):
 
 
 # Hardcode the files for ease.
-def make_dataset_arches(root, mode):
+def make_dataset_arches(root, mode, test_file):
     file_name_list = []
 
-    if mode == 'train':
+    if mode == 'loocv':
+        for f in os.listdir(root):
+            if f != test_file:
+                file_name_list.append(f)
+    elif mode == 'loocv_test':
+        return [test_file]
+    elif mode == 'train':
         # file_name_list = ["01_01.laz", "01_02.laz", "01_03.laz", "02_01.laz", "02_02.laz", "02_03.laz", "02_04.laz", "03_01.laz", "03_02.laz", "03_03.laz", "03_04.laz"]
         # file_name_list = ["01_01_norm.laz", "01_02_norm.laz", "01_03_norm.laz", "02_01_norm.laz", "02_02_norm.laz", "02_03_norm.laz", "02_04_norm.laz", "03_01_norm.laz", "03_02_norm.laz", "03_03_norm.laz", "03_04_norm.laz"]
         for f in os.listdir(root):
@@ -62,7 +68,7 @@ def make_dataset_arches(root, mode):
 
         # file_name_list = ["01_01.laz", "01_02.laz", "01_03.laz", "02_01.laz", "02_02.laz", "02_03.laz", "02_04.laz", "03_01.laz", "03_02.laz", "03_03.laz", "03_04.laz"]
     else:
-        raise Exception('Mode should be train/test.')
+        raise Exception('Mode should be loocv/train/test.')
 
     return file_name_list
 
@@ -122,11 +128,12 @@ class FarthestSampler:
 
 
 class ArchesLoader(data.Dataset):
-    def __init__(self, root, mode, opt):
+    def __init__(self, root, mode, opt, test_file):
         super(ArchesLoader, self).__init__()
         self.root = root
         self.opt = opt
         self.mode = mode
+        self.test_file = test_file
 
         # Parameters for SOM
         self.node_num = opt.node_num
@@ -141,7 +148,7 @@ class ArchesLoader(data.Dataset):
         # Normalize? Need max and min of x, y and z
 
         # self.dataset = make_dataset_shapenet_normal(self.root, self.mode) # list of file names
-        self.dataset = make_dataset_arches(self.root, self.mode) # list of file names
+        self.dataset = make_dataset_arches(self.root, self.mode, self.test_file) # list of file names
         # ensure there is no batch-1 batch
         # if len(self.dataset) % self.opt.batch_size == 1:
         #     self.dataset.pop()

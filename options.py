@@ -21,8 +21,13 @@ class Options():
         self.parser.add_argument('--epochs', type=int, default=5, help='number of training epochs')
         self.parser.add_argument('--batch_size', type=int, default=8, help='input batch size')
         self.parser.add_argument('--input_pc_num', type=int, default=131072, help='# of input points')
-        self.parser.add_argument('--surface_normal', type=bool, default=False, help='use surface normal in the pc input')
+        self.parser.add_argument('--surface_normal', action="store_true", help='use surface normal in the pc input')
+        self.parser.add_argument('--no_surface_normal', action="store_false", dest="surface_normal", help='do not use surface normal in the pc input')
         self.parser.add_argument('--nThreads', default=0, type=int, help='# threads for loading data')
+
+        # args.loocv defaults to False.
+        self.parser.add_argument('--loocv', action="store_true", help="use leave-one-out cross validation to test model")
+        self.parser.add_argument('--no_loocv', action="store_false", dest="loocv", help="do not use leave-one-out cross validation to test model")
 
         self.parser.add_argument('--display_winsize', type=int, default=256, help='display window size')
         self.parser.add_argument('--display_id', type=int, default=200, help='window id of the web display')
@@ -36,6 +41,8 @@ class Options():
         self.parser.add_argument('--normalization', type=str, default='batch', help='normalization function: batch, instance')
 
         self.parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
+        self.parser.add_argument('--lr_decay_step', type=float, default=100, help='after how many epochs lr is reduced')
+        self.parser.add_argument('--lr_decay_rate', type=float, default=0.5, help='rate of the lr decay')
         self.parser.add_argument('--dropout', type=float, default=0.5, help='dropout rate')
         self.parser.add_argument('--node_num', type=int, default=64, help='som node number')
         self.parser.add_argument('--k', type=int, default=3, help='knn search')

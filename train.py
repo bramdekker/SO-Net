@@ -1,5 +1,6 @@
 import time
 import copy
+import os
 import numpy as np
 import math
 import laspy
@@ -63,14 +64,163 @@ def count_parameters(model):
     print(f"Total Trainable Params: {total_params}")
     return total_params
 
-# Get full dataset and then split in train- and testloader.
-# Split dataset 70 for autoencoder (11 samples), 15 supervised training segmenter (2 samples), 15 validation segmenter (2 samples).
-# Need to make sure that the data samples are non-overlapping, or can autoencoder be trained on all data?
-# Normalize data: normalized to be zero-mean to range [-1, 1]
-# Use augmentation (rotation, downsampling, translation) to get more data.
-# What do I want to test? Train autoencoder on a lot of data, also augmented.
-# The generated clusters should be good so that they can be labeled by a user (better to have smaller clusters, then big)
-if __name__=='__main__':
+def train_loocv(opt):
+    """Train and validate the autoencoder with leave-one-out cross validation method."""
+    # ~270 million params (PointNet ~ 4M, MVCNN ~ 60M)
+    file_list = os.listdir(opt.root)
+
+    for f in file_list:
+        trainset = ArchesLoader(opt.dataroot, 'loocv', opt, f)
+        trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
+
+        testset = ArchesLoader(opt.dataroot, 'loocv_test', opt, f)
+        testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
+
+        model = Model(opt) #.to(device)?
+        before_train_mem = torch.cuda.memory_allocated(opt.device)
+        print(f"Amount of GPU memory allocated in MB before training (approx. 15.000 available): {before_train_mem / 1000000}")
+
+        train_losses = []
+        test_losses = []
+
+        for epoch in range(opt.epochs):
+            begin_epoch = time.time()
+
+            epoch_iter = 0
+            train_loss = 0
+            batch_amount = 0
+            for i, data in enumerate(trainloader):
+                epoch_iter += opt.batch_size
+                
+                input_pc, input_sn, input_label, input_node, input_node_knn_I = data # pc, label, som_node, som_knn_I
+                model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
+
+                batch_amount += input_label.size()[0]
+                model.optimize()
+
+                train_loss += model.loss.cpu().data * input_label.size()[0]
+
+                # Save original and reconstructed point cloud of 1st batch of last epoch to files.
+                if epoch == opt.epochs - 1 and i == 0:
+                    input_pred_dict = model.get_current_visuals()
+                    input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
+                    print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
+
+                    for i in range(len(input_pc)):
+                        # Save original point cloud.
+                        input_data = input_pc[i]
+                        # 1. Create a new header
+                        header = laspy.LasHeader(point_format=6, version="1.4")
+
+                        # 2. Create a Las
+                        las = laspy.LasData(header)
+
+                        las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+                        las.y = input_data[1]
+                        las.z = input_data[2]
+
+                        las.write("train_%s_original_pc_%d.las" % (f, i))
+
+                        # Save predicted point cloud.
+                        predicted_data = predicted_pc[i]
+                        # 1. Create a new header
+                        header = laspy.LasHeader(point_format=6, version="1.4")
+
+                        # 2. Create a Las
+                        las2 = laspy.LasData(header)
+
+                        las2.x = predicted_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+                        las2.y = predicted_data[1]
+                        las2.z = predicted_data[2]
+
+                        las2.write("train_%s_predicted_pc_%d.las" % (f, i))
+
+
+            train_loss /= batch_amount
+            train_losses.append(train_loss)
+
+            end_train = time.time()
+            print(f"Epoch {epoch} took {end_train-begin_epoch} seconds.")
+
+            # learning rate decay
+            if epoch%opt.lr_decay_step==0 and epoch>0:
+                model.update_learning_rate(opt.lr_decay_rate)
+
+            # # save network
+            # if epoch%1==0 and epoch>0:
+            #     print("Saving network...")
+            #     model.save_network(model.encoder, 'encoder', '%d_%f' % (epoch, model.test_loss.item()), opt.gpu_id)
+            #     model.save_network(model.decoder, 'decoder', '%d_%f' % (epoch, model.test_loss.item()), opt.gpu_id)
+
+
+        # test network
+        if epoch >= 0 and epoch%1==0:
+            with torch.no_grad():
+                batch_amount = 0
+                model.test_loss.data.zero_()
+                test_loss = 0
+                
+                for i, data in enumerate(testloader):
+                    input_pc, input_sn, input_label, input_node, input_node_knn_I = data
+                    model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
+                    model.test_model()
+
+                    batch_amount += input_label.size()[0]
+                    test_loss += model.loss.cpu().data * input_label.size()[0]
+
+                test_loss /= batch_amount
+
+                test_losses.append(test_loss)
+            
+                # Save predictions and originals inputs of the testset.
+                if epoch == opt.epochs - 1:
+                    input_pred_dict = model.get_current_visuals()
+                    input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
+                    print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
+
+                    for i in range(len(input_pc)):
+                        # Save original point cloud.
+                        input_data = input_pc[i]
+                        # 1. Create a new header
+                        header = laspy.LasHeader(point_format=6, version="1.4")
+
+                        # 2. Create a Las
+                        las = laspy.LasData(header)
+
+                        las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+                        las.y = input_data[1]
+                        las.z = input_data[2]
+
+                        las.write("test_%s_loocv_original_pc_%d.las" % (f, i))
+
+                        # Save predicted point cloud.
+                        predicted_data = predicted_pc[i]
+                        # 1. Create a new header
+                        header = laspy.LasHeader(point_format=6, version="1.4")
+
+                        # 2. Create a Las
+                        las2 = laspy.LasData(header)
+
+                        las2.x = predicted_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+                        las2.y = predicted_data[1]
+                        las2.z = predicted_data[2]
+
+                        las2.write("test_%s_loocv_predicted_pc_%d.las" % (f, i))
+
+        end_test = time.time()
+        print(f"Testing took {end_test-end_train} seconds.")
+
+        print(f"Length of all training losses should be equal to number of epochs ({opt.epochs}): {len(train_losses)}")
+        print(f"Length of all test losses should be equal to number of epochs ({opt.epochs}): {len(test_losses)}")
+
+        print("Train losses: ", train_losses)
+        print("Test losses: ", test_losses)
+
+        plot_train_test_loss(opt.epochs, train_losses, test_losses)
+
+
+def main():
+    """Main function that executes the regular training and testing."""
     if opt.dataset=='modelnet' or opt.dataset=='shrec':
         trainset = ModelNet_Shrec_Loader(opt.dataroot, 'train', opt)
         dataset_size = len(trainset)
@@ -84,12 +234,13 @@ if __name__=='__main__':
         dataset_size = len(trainset)
         trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
         print('#training point clouds = %d' % len(trainset))
-
-        # tesetset = ShapeNetLoader(opt.dataroot, 'test', opt)
-        # testloader = torch.utils.data.DataLoader(tesetset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
         testset = ShapeNetLoader(opt.dataroot, 'test', opt)
         testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
     elif opt.dataset=='catenary_arches':
+        if opt.loocv:
+            train_loocv(opt)
+            return
+
         trainset = ArchesLoader(opt.dataroot, 'train', opt)
         dataset_size = len(trainset)
         trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
@@ -331,8 +482,8 @@ if __name__=='__main__':
         print(f"Testing after epoch {epoch} took {end_test-end_train} seconds.")
 
         # learning rate decay
-        if epoch%20==0 and epoch>0:
-            model.update_learning_rate(0.5)
+        if epoch%opt.lr_decay_step==0 and epoch>0:
+            model.update_learning_rate(opt.lr_decay_rate)
 
         # save network
         if epoch%1==0 and epoch>0:
@@ -349,6 +500,12 @@ if __name__=='__main__':
     plot_train_test_loss(opt.epochs, train_losses, test_losses)
 
 
-
-
-
+# Get full dataset and then split in train- and testloader.
+# Split dataset 70 for autoencoder (11 samples), 15 supervised training segmenter (2 samples), 15 validation segmenter (2 samples).
+# Need to make sure that the data samples are non-overlapping, or can autoencoder be trained on all data?
+# Normalize data: normalized to be zero-mean to range [-1, 1]
+# Use augmentation (rotation, downsampling, translation) to get more data.
+# What do I want to test? Train autoencoder on a lot of data, also augmented.
+# The generated clusters should be good so that they can be labeled by a user (better to have smaller clusters, then big)
+if __name__=='__main__':
+    main()
