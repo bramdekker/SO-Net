@@ -70,6 +70,7 @@ def make_dataset_arches(root, mode, test_file):
     else:
         raise Exception('Mode should be loocv/train/test.')
 
+    print(f"The file list for ArchesLoader is {file_name_list}")
     return file_name_list
 
 
