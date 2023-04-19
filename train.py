@@ -211,13 +211,13 @@ def train_loocv(opt):
         end_test = time.time()
         print(f"Testing took {end_test-end_train} seconds.")
 
-        print(f"Length of all training losses should be equal to number of epochs ({opt.epochs}): {len(train_losses)}")
-        print(f"Length of all test losses should be equal to number of epochs ({opt.epochs}): {len(test_losses)}")
+        # print(f"Length of all training losses should be equal to number of epochs ({opt.epochs}): {len(train_losses)}")
+        # print(f"Length of all test losses should be equal to number of epochs ({opt.epochs}): {len(test_losses)}")
 
         print("Train losses: ", train_losses)
         print("Test losses: ", test_losses)
 
-        plot_train_test_loss(opt.epochs, train_losses, test_losses)
+        # plot_train_test_loss(opt.epochs, train_losses, test_losses)
 
 
 def main():
