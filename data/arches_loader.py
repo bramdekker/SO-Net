@@ -50,7 +50,7 @@ def make_dataset_arches(root, mode, test_file):
 
     if mode == 'loocv':
         for f in os.listdir(root):
-            if f != test_file:
+            if f != test_file and (f.endswith(".las") or f.endswith(".laz")):
                 file_name_list.append(f)
     elif mode == 'loocv_test':
         return [test_file]
@@ -181,6 +181,7 @@ class ArchesLoader(data.Dataset):
             # print(f"Length of dataset is (24): {len(self.dataset)}")
             # print(f"Dataset index is (0-3): {dataset_idx}")
         file = self.dataset[dataset_idx][0:-4]
+        print(f"With dataset idx {dataset_idx} and index {index}, the file to fetch is {file}.")
         file_ext = ".npz"
         if self.opt.surface_normal:
             file_ext = "_sn.npz"
