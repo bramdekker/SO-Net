@@ -245,9 +245,9 @@ class ArchesLoader(data.Dataset):
             # print(f"Shape after random noise is {som_node_np.shape}")
 
 
-            # 0, 3 = -45
+            # 0, 3 = -30
             # 1, 4 = 0
-            # 2, 5 = 45
+            # 2, 5 = 30
             rotation_angle = self.rotations[augmentation_idx % len(self.rotations)]
             if rotation_angle != 0:
                 # print("Rotating point cloud")

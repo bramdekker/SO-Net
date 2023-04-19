@@ -38,10 +38,31 @@ def random_gaussian_noise(data, mean, std):
     noise = np.clip(std * np.random.randn(data.shape[0], data.shape[1]) + mean, -0.05, 0.05)
     return data + noise
 
+def random_rotate_point_cloud(data, min_angle, max_angle):
+    """Rotate over random angle in degrees between [min_angle, max_angle] 
+       the point clouds to augument the dataset
+        Input:
+          Nx3 array, original point clouds + angle to rotate over in degrees
+        Return:
+          Nx3 array, rotated point clouds
+    """
+    rotated_data = np.zeros(data.shape, dtype=np.float32)
+
+    angle = random.randint(min_angle, max_angle)
+    rotation_angle = angle * (np.pi / 180.0)
+    cosval = np.cos(rotation_angle)
+    sinval = np.sin(rotation_angle)
+
+    # Standard rotation matrix over z-axis.
+    rotation_matrix = np.array([[cosval, -sinval, 0],
+                                [sinval, cosval, 0],
+                                [0, 0, 1]])
+    rotated_data = np.dot(rotation_matrix, data)
+
+    return rotated_data
 
 def rotate_point_cloud(data, angle):
-    """ Rotate the point clouds to augument the dataset
-        rotation is per shape based along up direction
+    """ Rotate over angle in degrees the point clouds to augument the dataset
         Input:
           Nx3 array, original point clouds + angle to rotate over in degrees
         Return:
