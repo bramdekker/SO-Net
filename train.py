@@ -67,7 +67,8 @@ def count_parameters(model):
 def train_loocv(opt):
     """Train and validate the autoencoder with leave-one-out cross validation method."""
     # ~270 million params (PointNet ~ 4M, MVCNN ~ 60M)
-    file_list = [f for f in os.listdir(opt.dataroot) if os.path.isfile(f) and (f.endswith(".las") or f.endswith(".laz"))]
+    file_list = [f for f in os.listdir(opt.dataroot) if (f.endswith(".las") or f.endswith(".laz"))]
+    print(f"File list is {file_list}")
 
     for f in file_list:
         trainset = ArchesLoader(opt.dataroot, 'loocv', opt, f)
