@@ -64,11 +64,15 @@ def count_parameters(model):
     print(f"Total Trainable Params: {total_params}")
     return total_params
 
+# TODO: calculate mean and std of losses of all testsets to get overall performance indication.
+# TODO: save all test losses in single array to ease visualization.
 def train_loocv(opt):
     """Train and validate the autoencoder with leave-one-out cross validation method."""
     # ~270 million params (PointNet ~ 4M, MVCNN ~ 60M)
     file_list = [f for f in os.listdir(opt.dataroot) if (f.endswith(".las") or f.endswith(".laz"))]
-    print(f"File list is {file_list}")
+    print_epochs_time = True
+
+    test_losses = []
 
     for f in file_list:
         trainset = ArchesLoader(opt.dataroot, 'loocv', opt, f)
@@ -82,7 +86,6 @@ def train_loocv(opt):
         print(f"Amount of GPU memory allocated in MB before training (approx. 15.000 available): {before_train_mem / 1000000}")
 
         train_losses = []
-        test_losses = []
 
         for epoch in range(opt.epochs):
             begin_epoch = time.time()
@@ -141,7 +144,9 @@ def train_loocv(opt):
             train_losses.append(train_loss)
 
             end_train = time.time()
-            print(f"Epoch {epoch} took {end_train-begin_epoch} seconds.")
+            if print_epochs_time:
+                print(f"Epoch {epoch} took {end_train-begin_epoch} seconds.")
+                print_epochs_time = False
 
             # learning rate decay
             if epoch%opt.lr_decay_step==0 and epoch>0:
@@ -218,6 +223,8 @@ def train_loocv(opt):
         print("Test losses: ", test_losses)
 
         # plot_train_test_loss(opt.epochs, train_losses, test_losses)
+    test_loss_np = np.asarray(test_losses)
+    print(f"The mean test loss is {np.mean(test_loss_np)} and the standard deviation is {np.std(test_loss_np)}")
 
 
 def main():
