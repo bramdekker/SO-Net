@@ -176,7 +176,7 @@ def train_loocv(opt):
 
                 test_loss /= batch_amount
 
-                test_losses.append(test_loss)
+                test_losses.append((f, test_loss))
             
                 # Save predictions and originals inputs of the testset.
                 if epoch == opt.epochs - 1:
@@ -220,11 +220,15 @@ def train_loocv(opt):
         # print(f"Length of all test losses should be equal to number of epochs ({opt.epochs}): {len(test_losses)}")
 
         print("Train losses: ", train_losses)
-        print("Test losses: ", test_losses)
+        # print("Test losses: ", test_losses)
 
         # plot_train_test_loss(opt.epochs, train_losses, test_losses)
-    test_loss_np = np.asarray(test_losses)
-    print(f"The mean test loss is {np.mean(test_loss_np)} and the standard deviation is {np.std(test_loss_np)}")
+    # test_loss_np = np.asarray(test_losses)
+    test_names_tuple, test_loss_tuple = zip(*test_losses)
+    for i in range(len(test_names_tuple)):
+        print(f"Test file {test_names_tuple[i]} has a loss of {test_loss_tuple[i]}", end=' ')
+    test_losses_np = np.asarray(test_loss_tuple)
+    print(f"The mean test loss is {np.mean(test_losses_np)} and the standard deviation is {np.std(test_losses_np)}")
 
 
 def main():
