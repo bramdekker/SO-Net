@@ -70,7 +70,7 @@ def make_dataset_arches(root, mode, test_file):
     else:
         raise Exception('Mode should be loocv/train/test.')
 
-    print(f"The file list for ArchesLoader is {file_name_list}")
+    # print(f"The file list for ArchesLoader is {file_name_list}")
     return file_name_list
 
 
@@ -181,7 +181,7 @@ class ArchesLoader(data.Dataset):
             # print(f"Length of dataset is (24): {len(self.dataset)}")
             # print(f"Dataset index is (0-3): {dataset_idx}")
         file = self.dataset[dataset_idx][0:-4]
-        print(f"With dataset idx {dataset_idx} and index {index}, the file to fetch is {file}.")
+        # print(f"With dataset idx {dataset_idx} and index {index}, the file to fetch is {file}.")
         file_ext = ".npz"
         if self.opt.surface_normal:
             file_ext = "_sn.npz"
