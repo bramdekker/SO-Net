@@ -200,6 +200,11 @@ class ArchesLoader(data.Dataset):
             sn_np = data['sn']
         # seg_np = data['part_label']
         som_node_np = data['som_node'] # 3 x 64 (node_num)
+
+        if index == 0:
+            print(pc_np.dtype)
+            print(sn_np.dtype)
+            print(som_node_np.dtype)
         # som_node_np = np.transpose(data['som_node']) #3x64
         # print(f"Inital som_node_np shape is {som_node_np.shape}")
 
