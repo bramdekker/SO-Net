@@ -196,7 +196,6 @@ class ArchesLoader(data.Dataset):
         sn_np = np.ones_like(pc_np)
         # print(f"Type of sn_np is {type(sn_np)}")
 
-        print(f"The arrays in data are: {data.files}")
         if self.opt.surface_normal and 'sn' in data.files:
             sn_np = data['sn']
         # seg_np = data['part_label']
