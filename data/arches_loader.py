@@ -183,8 +183,8 @@ class ArchesLoader(data.Dataset):
         file = self.dataset[dataset_idx][0:-4]
         # print(f"With dataset idx {dataset_idx} and index {index}, the file to fetch is {file}.")
         file_ext = ".npz"
-        if self.opt.surface_normal:
-            file_ext = "_sn.npz"
+        # if self.opt.surface_normal:
+        #     file_ext = "_sn.npz"
         # print(f"Just before np load of npz file {file}")
         data = np.load(os.path.join(self.root, '%dx%d' % (self.rows, self.cols), file + file_ext))
 
