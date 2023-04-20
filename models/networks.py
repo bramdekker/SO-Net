@@ -78,11 +78,11 @@ class Encoder(nn.Module):
         self.transformer = Transformer(opt)
 
         # first PointNet
-        # if self.opt.surface_normal == True:
-        #     self.first_pointnet = PointResNet(6, [64, 128, 256, 384], activation=self.opt.activation, normalization=self.opt.normalization,
-        #                                       momentum=opt.bn_momentum, bn_momentum_decay_step=opt.bn_momentum_decay_step, bn_momentum_decay=opt.bn_momentum_decay)
-        # else:
-        self.first_pointnet = PointResNet(3, [64, 128, 256, 384], activation=self.opt.activation, normalization=self.opt.normalization,
+        if self.opt.surface_normal == True:
+            self.first_pointnet = PointResNet(6, [64, 128, 256, 384], activation=self.opt.activation, normalization=self.opt.normalization,
+                                              momentum=opt.bn_momentum, bn_momentum_decay_step=opt.bn_momentum_decay_step, bn_momentum_decay=opt.bn_momentum_decay)
+        else:
+            self.first_pointnet = PointResNet(3, [64, 128, 256, 384], activation=self.opt.activation, normalization=self.opt.normalization,
                                               momentum=opt.bn_momentum, bn_momentum_decay_step=opt.bn_momentum_decay_step, bn_momentum_decay=opt.bn_momentum_decay)
 
         if self.opt.som_k >= 2:
@@ -170,6 +170,7 @@ class Encoder(nn.Module):
 
         self.x_decentered = (x_stack - self.centers).detach()  # Bx3xkN
         x_augmented = torch.cat((self.x_decentered, sn_stack), dim=1)  # Bx6xkN
+        print(f"Shape of x_augmented is {x_augmented.shape}")
 
         # go through the first PointNet
         if self.opt.surface_normal == True:
@@ -177,11 +178,15 @@ class Encoder(nn.Module):
         else:
             self.first_pn_out = self.first_pointnet(self.x_decentered, epoch)
 
+        print(f"Shape of first pointnet output is {self.first_pn_out.shape}")
+
         M = node.size()[2]
         with torch.cuda.device(self.first_pn_out.get_device()):
             gather_index = index_max.forward_cuda(self.first_pn_out.detach(),
                                                   min_idx.int(),
                                                   M).detach().long()
+
+        print("After using index_max to get a gather_index.")
         self.first_pn_out_masked_max = self.first_pn_out.gather(dim=2, index=gather_index * mask_row_max.unsqueeze(1).long())  # BxCxM
 
         if self.opt.som_k >= 2:
