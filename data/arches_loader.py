@@ -129,7 +129,7 @@ class FarthestSampler:
 
 
 class ArchesLoader(data.Dataset):
-    def __init__(self, root, mode, opt, test_file):
+    def __init__(self, root, mode, opt, test_file=""):
         super(ArchesLoader, self).__init__()
         self.root = root
         self.opt = opt
