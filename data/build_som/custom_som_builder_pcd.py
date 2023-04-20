@@ -26,11 +26,11 @@ def som_saver_catenary_arches(root, rows, cols, gpu_ids, output_root):
         sn_np = np.asarray(f_pcd.normals).T
 
         # Downsample point cloud to take 524288 random points.
-        pc_sampled = pc_np[:, np.random.choice(pc_np.shape[1], 1048576, replace=False)] # 3 x sample_size
+        pc_sampled = pc_np[:, np.random.choice(pc_np.shape[1], 1024, replace=False)] # 3 x sample_size
         pc = torch.from_numpy(pc_sampled).cuda()
 
         # Train SOM
-        som_builder.optimize(pc)
+        som_builder.optimize(pc) # SOM expects a 3xN array ([x0 .. xn], [y0 .. yn], [z0 .. zn]]
         som_node_np = som_builder.node.cpu().numpy().astype(np.float32)  # 3 x node_num
         
         # Save file as npz
