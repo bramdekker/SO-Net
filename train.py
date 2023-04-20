@@ -25,18 +25,6 @@ from data.arches_loader import ArchesLoader
 from data.shapenet_loader import ShapeNetLoader
 # from util.visualizer import Visualizer
 
-# TODO: track training / test time
-# batch size = 8 / input_pc_num = 16384
-# TODO: visualize training and test losses
-# Number of parameters in decoder SO-Net (in paper):
-# - Conv part: 
-#       - 
-# - FC part: 27.273.728 params
-#       - 1st: 1024 * 2048 (weights) + 2048 (biases) = 2.099.200
-#       - 2nd: 2048 * 3072 (weights) + 3072 (biases) = 6.294.528
-#       - 3rd: 3072 * 4096 + 4096 = 12.587.008
-#       - 4th: 4096 * 512 * 3 + 512 * 3 = 6.292.992
-
 def plot_train_test_loss(epochs, train_loss, test_loss):
     """Plot the average train and testloss per epoch on a line plot."""
     # Actually starts at 1.
@@ -64,8 +52,6 @@ def count_parameters(model):
     print(f"Total Trainable Params: {total_params}")
     return total_params
 
-# TODO: calculate mean and std of losses of all testsets to get overall performance indication.
-# TODO: save all test losses in single array to ease visualization.
 def train_loocv(opt):
     """Train and validate the autoencoder with leave-one-out cross validation method."""
     # ~270 million params (PointNet ~ 4M, MVCNN ~ 60M)
@@ -339,11 +325,18 @@ def main():
                 after_loading_input_mem = torch.cuda.memory_allocated(opt.device)
                 print(f"Amount of GPU memory allocated in MB after loading input: {after_loading_input_mem / 1000000}")
 
+            # Check shapes of loaded data.
+            print(f"Shape of input_pc is (3x4096) {input_pc.shape}")
+            print(f"Shape of input_sn is (3x4096) {input_sn.shape}")
+            print(f"Shape of input_node is (3x64) {input_node.shape}")
+            print(f"Shape of input_node_knn_I is (64x3) {input_node_knn_I.shape}")
+
+
             batch_amount += input_label.size()[0]
             # print(f"Input label.size()[0] is {input_label.size()[0]} ")
             # print('About to optimize the model based on current training batch')
             model.optimize()
-            # print('After optimizing the model based on current training batch')
+            print('After optimizing the model based on current training batch')
 
 
             train_loss += model.loss.cpu().data * input_label.size()[0]

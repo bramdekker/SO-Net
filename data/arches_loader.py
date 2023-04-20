@@ -300,6 +300,7 @@ class ArchesLoader(data.Dataset):
         # kNN search: som -> som
         if self.opt.som_k >= 2:
             # print(f"Shape of some_node_np is {som_node_np.shape}")
+            # D, I == distances, indices?
             D, I = self.knn_builder.self_build_search(som_node_np.transpose()) # Input is Nx3
             som_knn_I = torch.from_numpy(I.astype(np.int64))  # node_num x som_k
             # print(f"som_knn_I shape (64 x 9): {som_knn_I.shape}")
