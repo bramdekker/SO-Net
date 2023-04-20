@@ -329,7 +329,9 @@ def main():
             print(f"Shape of input_pc is (3x4096) {input_pc.shape}")
             print(f"Shape of input_sn is (3x4096) {input_sn.shape}")
             print(f"Shape of input_node is (3x64) {input_node.shape}")
-            print(f"Shape of input_node_knn_I is (64x3) {input_node_knn_I.shape}")
+            print(f"Shape of input_node_knn_I is (64x9) {input_node_knn_I.shape}")
+
+            time.sleep(2)
 
 
             batch_amount += input_label.size()[0]
