@@ -196,7 +196,7 @@ class ArchesLoader(data.Dataset):
         sn_np = np.ones_like(pc_np)
         # print(f"Type of sn_np is {type(sn_np)}")
 
-        if self.opt.surface_normal:
+        if self.opt.surface_normal and data['sn']:
             sn_np = data['sn']
         # seg_np = data['part_label']
         som_node_np = data['som_node'] # 3 x 64 (node_num)
