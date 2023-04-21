@@ -322,14 +322,15 @@ def main():
                 # print('Going to unpack the data of a single batch')
                 input_pc, input_sn, input_label, input_node, input_node_knn_I = data # pc, label, som_node, som_knn_I
                 model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
-                after_loading_input_mem = torch.cuda.memory_allocated(opt.device)
-                print(f"Amount of GPU memory allocated in MB after loading input: {after_loading_input_mem / 1000000}")
+                if epoch == 0:
+                    after_loading_input_mem = torch.cuda.memory_allocated(opt.device)
+                    print(f"Amount of GPU memory allocated in MB after loading input: {after_loading_input_mem / 1000000}")
 
             # Check shapes of loaded data.
-            print(f"Shape of input_pc is (3x4096) {input_pc.shape}")
-            print(f"Shape of input_sn is (3x4096) {input_sn.shape}")
-            print(f"Shape of input_node is (3x64) {input_node.shape}")
-            print(f"Shape of input_node_knn_I is (64x9) {input_node_knn_I.shape}")
+            # print(f"Shape of input_pc is (3x4096) {input_pc.shape}")
+            # print(f"Shape of input_sn is (3x4096) {input_sn.shape}")
+            # print(f"Shape of input_node is (3x64) {input_node.shape}")
+            # print(f"Shape of input_node_knn_I is (64x9) {input_node_knn_I.shape}")
 
             time.sleep(2)
 
@@ -338,7 +339,7 @@ def main():
             # print(f"Input label.size()[0] is {input_label.size()[0]} ")
             # print('About to optimize the model based on current training batch')
             model.optimize()
-            print('After optimizing the model based on current training batch')
+            # print('After optimizing the model based on current training batch')
 
 
             train_loss += model.loss.cpu().data * input_label.size()[0]
@@ -366,7 +367,7 @@ def main():
             if epoch == opt.epochs - 1 and i == 0:
                 input_pred_dict = model.get_current_visuals()
                 input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
-                print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
+                # print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
 
                 for i in range(len(input_pc)):
                     # Save original point cloud.
@@ -383,7 +384,7 @@ def main():
                     las.z = input_data[2]
                     # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
 
-                    las.write("original_pc_%d.las" % i)
+                    las.write("original_pc_train_%d.las" % i)
 
                     # Save predicted point cloud.
                     predicted_data = predicted_pc[i]
@@ -399,7 +400,7 @@ def main():
                     las2.z = predicted_data[2]
                     # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
 
-                    las2.write("predicted_pc_%d.las" % i)
+                    las2.write("predicted_pc_train_%d.las" % i)
 
 
         train_loss /= batch_amount
@@ -450,7 +451,7 @@ def main():
                 if epoch == opt.epochs - 1:
                     input_pred_dict = model.get_current_visuals()
                     input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
-                    print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
+                    # print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
 
                     for i in range(len(input_pc)):
                         # Save original point cloud.
