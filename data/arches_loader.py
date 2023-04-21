@@ -201,10 +201,10 @@ class ArchesLoader(data.Dataset):
         # seg_np = data['part_label']
         som_node_np = data['som_node'] # 3 x 64 (node_num)
 
-        if index == 0:
-            print(pc_np.dtype)
-            print(sn_np.dtype)
-            print(som_node_np.dtype)
+        # if index == 0:
+        #     print(pc_np.dtype)
+        #     print(sn_np.dtype)
+        #     print(som_node_np.dtype)
         # som_node_np = np.transpose(data['som_node']) #3x64
         # print(f"Inital som_node_np shape is {som_node_np.shape}")
 
@@ -236,7 +236,6 @@ class ArchesLoader(data.Dataset):
         # print(f"Shape just before augmentation is {pc_np.shape}")
 
         # print("Just after downsampling")
-        # TODO: check augmentation methods. One of them returns Nx3 data instead of 3xN!
         # augmentation
         if self.mode == 'train':
             # index 1-6: 1-3 without noise, 4-6 with noise
