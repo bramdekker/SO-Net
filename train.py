@@ -262,8 +262,8 @@ def test_model(model, dataset, epoch, opt):
             # Get the number of samples in current batch.
             batch_amount += input_label.size()[0]
 
-            # Train model on current batch.
-            model.optimize()
+            # Test the model.
+            model.test_model()
 
             # Get loss for current batch multiplied by number of samples in batch.
             test_loss += model.loss.cpu().data * input_label.size()[0]
