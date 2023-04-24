@@ -308,7 +308,7 @@ def main():
         train_losses_round = []
         test_losses_round = []
 
-        for i in opt.epochs:
+        for i in range(opt.epochs):
             # Train models and record training losses
             train_loss_round = train_model(ae_model, train_dataset, i, opt)
             train_losses_round.append(train_loss_round)
