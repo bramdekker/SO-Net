@@ -299,7 +299,7 @@ def main():
     # For every experiment, record lowest loss, all test losses and train losses. Losses are averages per epoch.
     # Lowest loss shape = (opt.avg_rounds) -> Avg lowest loss
     # Test/train losses shape = (opt.avg_rounds, epochs) -> Avg plots for train and test
-    for i in opt.avg_rounds:
+    for i in range(opt.avg_rounds):
         # Run experiment with randomly initizalized model, training- and test set.
         ae_model = Model(opt)
 
