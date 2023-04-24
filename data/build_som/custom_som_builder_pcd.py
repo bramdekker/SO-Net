@@ -4,6 +4,7 @@ import os.path
 import numpy as np
 import open3d as o3d
 import torch
+import argparse
 
 from util import som
 
@@ -41,11 +42,15 @@ def som_saver_catenary_arches(root, rows, cols, gpu_ids, output_root):
         np.savez(npz_file, pc=pc_np, sn=sn_np, som_node=som_node_np) # sn = surface normal
 
 if __name__ == "__main__":
-    rows, cols = 8, 8
-    if len(sys.argv) == 3:
-        rows, cols = sys.argv[1], sys.argv[2]
+    parser = argparse.ArgumentParser()
 
-    som_saver_catenary_arches('/home/jovyan/catenary_data_norm_17_sn', rows, cols, 0, '/home/jovyan/catenary_data_norm_17_sn/%dx%d'%(rows,cols))
+    parser.add_argument('--rows', help="The number of rows in the SOM", type=int, default=8)
+    parser.add_argument('--cols', help="The number of cols in the SOM", type=int, default=8)
+    parser.add_argument('--dir', '-d', help="Path to directory containing point cloud files", type=str, required=True)
+
+    args = parser.parse_args()
+
+    som_saver_catenary_arches(args.dir, args.rows, args.cols, 0, '%s%dx%d'%(args.dir, args.rows, args.cols))
 
 
     # if file[-3:] == 'txt':
