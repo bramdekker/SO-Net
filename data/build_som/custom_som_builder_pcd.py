@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    som_saver_catenary_arches(args.dir, args.rows, args.cols, 0, '%s%dx%d'%(args.dir, args.rows, args.cols))
+    som_saver_catenary_arches(args.dir, args.rows, args.cols, 0, '%s/%dx%d'%(args.dir, args.rows, args.cols))
 
 
     # if file[-3:] == 'txt':
