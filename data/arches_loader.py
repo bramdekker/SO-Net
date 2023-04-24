@@ -50,10 +50,12 @@ def make_dataset_arches(root, mode, test_file):
 
     if mode == 'loocv':
         for f in os.listdir(root):
-            if f != test_file and (f.endswith(".las") or f.endswith(".laz")):
+            if f != test_file and (f.endswith(".las") or f.endswith(".laz") or f.endswith(".pcd")):
                 file_name_list.append(f)
     elif mode == 'loocv_test':
         return [test_file]
+    elif mode == 'all':
+        return [f for f in os.listdir(root) if (f.endswith(".las") or f.endswith(".laz") or f.endswith(".pcd"))]
     elif mode == 'train':
         # file_name_list = ["01_01.laz", "01_02.laz", "01_03.laz", "02_01.laz", "02_02.laz", "02_03.laz", "02_04.laz", "03_01.laz", "03_02.laz", "03_03.laz", "03_04.laz"]
         # file_name_list = ["01_01_norm.laz", "01_02_norm.laz", "01_03_norm.laz", "02_01_norm.laz", "02_02_norm.laz", "02_03_norm.laz", "02_04_norm.laz", "03_01_norm.laz", "03_02_norm.laz", "03_03_norm.laz", "03_04_norm.laz"]

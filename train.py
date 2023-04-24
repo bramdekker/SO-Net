@@ -4,6 +4,7 @@ import os
 import numpy as np
 import math
 import laspy
+import argparse
 import matplotlib.pyplot as plt
 
 from options import Options
@@ -24,6 +25,9 @@ from data.modelnet_shrec_loader import ModelNet_Shrec_Loader
 from data.arches_loader import ArchesLoader
 from data.shapenet_loader import ShapeNetLoader
 # from util.visualizer import Visualizer
+
+def avg(l):
+    return sum(l) / len(l)
 
 def plot_train_test_loss(epochs, train_loss, test_loss):
     """Plot the average train and testloss per epoch on a line plot."""
@@ -51,6 +55,42 @@ def count_parameters(model):
     print(table)
     print(f"Total Trainable Params: {total_params}")
     return total_params
+
+def save_to_las(model, o_file_name, p_file_name):
+    """Save the current batch of reconstructions to LAS files otogether with the original point clouds."""
+    input_pred_dict = model.get_current_visuals()
+    input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
+
+    for i in range(len(input_pc)):
+        # Save original point cloud.
+        input_data = input_pc[i]
+        # 1. Create a new header
+        header = laspy.LasHeader(point_format=6, version="1.4")
+
+        # 2. Create a Las
+        las = laspy.LasData(header)
+
+        las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+        las.y = input_data[1]
+        las.z = input_data[2]
+        # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
+
+        las.write("%s_%d.las" % (o_file_name, i))
+
+        # Save predicted point cloud.
+        predicted_data = predicted_pc[i]
+        # 1. Create a new header
+        header = laspy.LasHeader(point_format=6, version="1.4")
+
+        # 2. Create a Las
+        las2 = laspy.LasData(header)
+
+        las2.x = predicted_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+        las2.y = predicted_data[1]
+        las2.z = predicted_data[2]
+        # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
+
+        las2.write("%s_%d.las" % (p_file_name, i))
 
 def train_loocv(opt):
     """Train and validate the autoencoder with leave-one-out cross validation method."""
@@ -92,39 +132,7 @@ def train_loocv(opt):
 
                 # Save original and reconstructed point cloud of 1st batch of last epoch to files.
                 if epoch == opt.epochs - 1 and i == 0:
-                    input_pred_dict = model.get_current_visuals()
-                    input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
-                    print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
-
-                    for i in range(len(input_pc)):
-                        # Save original point cloud.
-                        input_data = input_pc[i]
-                        # 1. Create a new header
-                        header = laspy.LasHeader(point_format=6, version="1.4")
-
-                        # 2. Create a Las
-                        las = laspy.LasData(header)
-
-                        las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
-                        las.y = input_data[1]
-                        las.z = input_data[2]
-
-                        las.write("train_%s_original_pc_%d.las" % (f, i))
-
-                        # Save predicted point cloud.
-                        predicted_data = predicted_pc[i]
-                        # 1. Create a new header
-                        header = laspy.LasHeader(point_format=6, version="1.4")
-
-                        # 2. Create a Las
-                        las2 = laspy.LasData(header)
-
-                        las2.x = predicted_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
-                        las2.y = predicted_data[1]
-                        las2.z = predicted_data[2]
-
-                        las2.write("train_%s_predicted_pc_%d.las" % (f, i))
-
+                    save_to_las(model, "train_%s_loocv_original_pc" % (f), "train_%s_loocv_predicted_pc" % f)
 
             train_loss /= batch_amount
             train_losses.append(train_loss)
@@ -135,7 +143,7 @@ def train_loocv(opt):
                 print_epochs_time = False
 
             # learning rate decay
-            if epoch%opt.lr_decay_step==0 and epoch>0:
+            if epoch % opt.lr_decay_step == 0 and epoch > 0:
                 model.update_learning_rate(opt.lr_decay_rate)
 
             # # save network
@@ -166,38 +174,7 @@ def train_loocv(opt):
             
                 # Save predictions and originals inputs of the testset.
                 if epoch == opt.epochs - 1:
-                    input_pred_dict = model.get_current_visuals()
-                    input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
-                    print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
-
-                    for i in range(len(input_pc)):
-                        # Save original point cloud.
-                        input_data = input_pc[i]
-                        # 1. Create a new header
-                        header = laspy.LasHeader(point_format=6, version="1.4")
-
-                        # 2. Create a Las
-                        las = laspy.LasData(header)
-
-                        las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
-                        las.y = input_data[1]
-                        las.z = input_data[2]
-
-                        las.write("test_%s_loocv_original_pc_%d.las" % (f, i))
-
-                        # Save predicted point cloud.
-                        predicted_data = predicted_pc[i]
-                        # 1. Create a new header
-                        header = laspy.LasHeader(point_format=6, version="1.4")
-
-                        # 2. Create a Las
-                        las2 = laspy.LasData(header)
-
-                        las2.x = predicted_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
-                        las2.y = predicted_data[1]
-                        las2.z = predicted_data[2]
-
-                        las2.write("test_%s_loocv_predicted_pc_%d.las" % (f, i))
+                    save_to_las(model, "test_%s_loocv_original_pc" % f, "test_%s_loocv_predicted_pc" % f)
 
         end_test = time.time()
         print(f"Testing took {end_test-end_train} seconds.")
@@ -217,7 +194,148 @@ def train_loocv(opt):
     print(f"The mean test loss is {np.mean(test_losses_np)} and the standard deviation is {np.std(test_losses_np)}")
 
 
+def train_model(model, dataset, epoch, opt):
+    """Train the model on the given dataset and using parameters defined in the Option object opt."""
+    trainloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
+
+    begin_epoch = time.time()
+
+    train_loss = 0
+    batch_amount = 0
+    for i, data in enumerate(trainloader):
+        # Extract batch input and store it in the model.
+        input_pc, input_sn, input_label, input_node, input_node_knn_I = data # pc, sn, label, som_node, som_knn_I
+        model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
+
+        # Print out memory for 1st epoch.
+        if epoch == 0:
+            after_loading_input_mem = torch.cuda.memory_allocated(opt.device)
+            print(f"Amount of GPU memory allocated in MB after loading input: {after_loading_input_mem / 1000000}")
+
+        # Get the number of samples in current batch.
+        batch_amount += input_label.size()[0]
+
+        # Train model on current batch.
+        model.optimize()
+
+        # Get loss for current batch multiplied by number of samples in batch.
+        train_loss += model.loss.cpu().data * input_label.size()[0]
+
+        # Save original and reconstructed point cloud of 1st batch of last epoch to files.
+        if opt.save_train_pcs and epoch == opt.epochs - 1 and i == 0:
+            save_to_las(model, "original_train", "predicted_train")
+
+    # Get average loss per sample.
+    train_loss /= batch_amount
+
+    end_train = time.time()
+
+    # Print approx time for epoch once.
+    if epoch == 0:
+        print(f"A training epoch {epoch} takes approx {int(end_train-begin_epoch)} seconds.")
+
+    return train_loss
+    
+
+def test_model(model, dataset, epoch, opt):
+    """Test the model on the given dataset and using parameters defined in the Option object opt."""
+    testloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
+
+    with torch.no_grad():
+        model.test_loss.data.zero_()
+
+        begin_epoch = time.time()
+
+        test_loss = 0
+        batch_amount = 0
+        for i, data in enumerate(testloader):
+
+            # Extract batch input and store it in the model.
+            input_pc, input_sn, input_label, input_node, input_node_knn_I = data # pc, sn, label, som_node, som_knn_I
+            model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
+
+            # Print out memory for 1st epoch.
+            if epoch == 0:
+                after_loading_input_mem = torch.cuda.memory_allocated(opt.device)
+                print(f"Amount of GPU memory allocated in MB after loading input: {after_loading_input_mem / 1000000}")
+
+            # Get the number of samples in current batch.
+            batch_amount += input_label.size()[0]
+
+            # Train model on current batch.
+            model.optimize()
+
+            # Get loss for current batch multiplied by number of samples in batch.
+            test_loss += model.loss.cpu().data * input_label.size()[0]
+
+            # Save original and reconstructed point cloud of 1st batch of last epoch to files.
+            if opt.save_test_pcs and epoch == opt.epochs - 1 and i == 0:
+                save_to_las(model, "original_test", "predicted_test")
+
+        # Get average loss per sample.
+        test_loss /= batch_amount
+
+        end_train = time.time()
+
+        # Print approx time for epoch once.
+        if epoch == 0:
+            print(f"A training epoch {epoch} takes approx {int(end_train-begin_epoch)} seconds.")
+
+        return test_loss
+
+
+
 def main():
+    test_losses = []
+    train_losses = []
+
+    train_frac = opt.train_fraction
+    test_frac = round(1 - train_frac, 2)
+    
+    dataset = ArchesLoader(opt.dataroot, 'all', opt)
+
+    training_size = int(train_frac * len(dataset))
+    test_size = int(test_frac * len(dataset))
+
+    # For every experiment, record lowest loss, all test losses and train losses. Losses are averages per epoch.
+    # Lowest loss shape = (opt.avg_rounds) -> Avg lowest loss
+    # Test/train losses shape = (opt.avg_rounds, epochs) -> Avg plots for train and test
+    for i in opt.avg_rounds:
+        # Run experiment with randomly initizalized model, training- and test set.
+        ae_model = Model(opt)
+
+        train_dataset, test_dataset = torch.utils.data.random_split(dataset, [training_size, test_size])
+
+        train_losses_round = []
+        test_losses_round = []
+
+        for i in opt.epochs:
+            # Train models and record training losses
+            train_loss_round = train_model(ae_model, train_dataset, i, opt)
+            train_losses_round.append(train_loss_round)
+
+            # Test model and record test losses
+            test_loss_round = test_model(ae_model, test_dataset, i, opt)
+            test_losses_round.append(test_loss_round)
+
+        # Add recorded train and test losses to arrays.
+        train_losses.append(train_losses_round)
+        test_losses.append(test_losses_round)
+
+    avg_lowest_test_loss = avg([min(arr) for arr in test_losses])
+
+    print(f"Average lowest test loss is {avg_lowest_test_loss}")
+
+    avg_train_losses = np.average(np.array(train_losses), axis=1)
+    avg_test_losses = np.average(np.array(test_losses), axis=1)
+
+    plot_train_test_loss(range(opt.epochs), avg_train_losses, avg_test_losses)
+
+    return
+
+        
+
+
     """Main function that executes the regular training and testing."""
     if opt.dataset=='modelnet' or opt.dataset=='shrec':
         trainset = ModelNet_Shrec_Loader(opt.dataroot, 'train', opt)
@@ -256,13 +374,13 @@ def main():
     count_parameters(model.decoder.conv_decoder.deconv1.up_sample)
 
 
-    pytorch_total_encoder_params = sum(p.numel() for p in model.encoder.parameters())
-    pytorch_total_decoder_params = sum(p.numel() for p in model.decoder.parameters())
-    print(f"Total number of parameters in encoder ({pytorch_total_encoder_params}) and decoder ({pytorch_total_decoder_params}): {pytorch_total_encoder_params + pytorch_total_decoder_params}")
+    # pytorch_total_encoder_params = sum(p.numel() for p in model.encoder.parameters())
+    # pytorch_total_decoder_params = sum(p.numel() for p in model.decoder.parameters())
+    # print(f"Total number of parameters in encoder ({pytorch_total_encoder_params}) and decoder ({pytorch_total_decoder_params}): {pytorch_total_encoder_params + pytorch_total_decoder_params}")
 
-    pytorch_train_encoder_params = sum(p.numel() for p in model.encoder.parameters() if p.requires_grad)
-    pytorch_train_decoder_params = sum(p.numel() for p in model.decoder.parameters() if p.requires_grad)
-    print(f"Total number of trainable parameters in encoder ({pytorch_train_encoder_params}) and decoder ({pytorch_train_decoder_params}): {pytorch_train_encoder_params + pytorch_train_decoder_params}")
+    # pytorch_train_encoder_params = sum(p.numel() for p in model.encoder.parameters() if p.requires_grad)
+    # pytorch_train_decoder_params = sum(p.numel() for p in model.decoder.parameters() if p.requires_grad)
+    # print(f"Total number of trainable parameters in encoder ({pytorch_train_encoder_params}) and decoder ({pytorch_train_decoder_params}): {pytorch_train_encoder_params + pytorch_train_decoder_params}")
 
     before_train_mem = torch.cuda.memory_allocated(opt.device)
     print(f"Amount of GPU memory allocated in MB before training (approx. 15.000 available): {before_train_mem / 1000000}")
