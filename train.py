@@ -321,15 +321,22 @@ def main():
             test_loss_round = test_model(ae_model, test_dataset, i, opt)
             test_losses_round.append(test_loss_round)
 
+        print(f"train_losses from this round are (number of epochs length): {train_losses_round}")
+        print(f"test_losses from this round are (number of epochs length): {test_losses_round}")
         # Add recorded train and test losses to arrays.
         train_losses.append(train_losses_round)
         test_losses.append(test_losses_round)
+
+    
+    print(f"train_losses for all rounds are (rounds x number of epochs length): {train_losses}")
+    print(f"test_losses for all rounds are (rounds x number of epochs length): {test_losses}")
 
     avg_lowest_test_loss = avg([min(arr) for arr in test_losses])
 
     print(f"Average lowest test loss is {avg_lowest_test_loss}")
 
-    avg_train_losses = np.average(np.array(train_losses), axis=1)
+    # TODO: shapes are not equal!!
+    avg_train_losses = np.average(np.array(train_losses), axis=1) # should be 25 x 1
     avg_test_losses = np.average(np.array(test_losses), axis=1)
 
     plot_train_test_loss(opt.epochs, avg_train_losses, avg_test_losses)
