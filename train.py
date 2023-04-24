@@ -284,7 +284,6 @@ def test_model(model, dataset, epoch, opt):
         return test_loss
 
 
-
 def main():
     test_losses = []
     train_losses = []
@@ -331,299 +330,295 @@ def main():
 
     plot_train_test_loss(range(opt.epochs), avg_train_losses, avg_test_losses)
 
-    return
 
-        
+    # """Main function that executes the regular training and testing."""
+    # if opt.dataset=='modelnet' or opt.dataset=='shrec':
+    #     trainset = ModelNet_Shrec_Loader(opt.dataroot, 'train', opt)
+    #     dataset_size = len(trainset)
+    #     trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
+    #     print('#training point clouds = %d' % len(trainset))
 
+    #     testset = ModelNet_Shrec_Loader(opt.dataroot, 'test', opt)
+    #     testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
+    # elif opt.dataset=='shapenet':
+    #     trainset = ShapeNetLoader(opt.dataroot, 'train', opt)
+    #     dataset_size = len(trainset)
+    #     trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
+    #     print('#training point clouds = %d' % len(trainset))
+    #     testset = ShapeNetLoader(opt.dataroot, 'test', opt)
+    #     testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
+    # elif opt.dataset=='catenary_arches':
+    #     if opt.loocv:
+    #         train_loocv(opt)
+    #         return
 
-    """Main function that executes the regular training and testing."""
-    if opt.dataset=='modelnet' or opt.dataset=='shrec':
-        trainset = ModelNet_Shrec_Loader(opt.dataroot, 'train', opt)
-        dataset_size = len(trainset)
-        trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
-        print('#training point clouds = %d' % len(trainset))
+    #     trainset = ArchesLoader(opt.dataroot, 'train', opt)
+    #     dataset_size = len(trainset)
+    #     trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
+    #     print('#training point clouds = %d' % len(trainset))
 
-        testset = ModelNet_Shrec_Loader(opt.dataroot, 'test', opt)
-        testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
-    elif opt.dataset=='shapenet':
-        trainset = ShapeNetLoader(opt.dataroot, 'train', opt)
-        dataset_size = len(trainset)
-        trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
-        print('#training point clouds = %d' % len(trainset))
-        testset = ShapeNetLoader(opt.dataroot, 'test', opt)
-        testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
-    elif opt.dataset=='catenary_arches':
-        if opt.loocv:
-            train_loocv(opt)
-            return
+    #     testset = ArchesLoader(opt.dataroot, 'test', opt)
+    #     testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
+    #     # print('#test point clouds = %d' % len(testset))
+    # else:
+    #     raise Exception('Dataset error.')
 
-        trainset = ArchesLoader(opt.dataroot, 'train', opt)
-        dataset_size = len(trainset)
-        trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
-        print('#training point clouds = %d' % len(trainset))
-
-        testset = ArchesLoader(opt.dataroot, 'test', opt)
-        testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
-        # print('#test point clouds = %d' % len(testset))
-    else:
-        raise Exception('Dataset error.')
-
-    # ~270 million params (PointNet ~ 4M, MVCNN ~ 60M)
-    model = Model(opt) #.to(device)?
-    count_parameters(model.decoder.conv_decoder.deconv1.conv)
-    count_parameters(model.decoder.conv_decoder.deconv1.up_sample)
+    # # ~270 million params (PointNet ~ 4M, MVCNN ~ 60M)
+    # model = Model(opt) #.to(device)?
+    # count_parameters(model.decoder.conv_decoder.deconv1.conv)
+    # count_parameters(model.decoder.conv_decoder.deconv1.up_sample)
 
 
-    # pytorch_total_encoder_params = sum(p.numel() for p in model.encoder.parameters())
-    # pytorch_total_decoder_params = sum(p.numel() for p in model.decoder.parameters())
-    # print(f"Total number of parameters in encoder ({pytorch_total_encoder_params}) and decoder ({pytorch_total_decoder_params}): {pytorch_total_encoder_params + pytorch_total_decoder_params}")
+    # # pytorch_total_encoder_params = sum(p.numel() for p in model.encoder.parameters())
+    # # pytorch_total_decoder_params = sum(p.numel() for p in model.decoder.parameters())
+    # # print(f"Total number of parameters in encoder ({pytorch_total_encoder_params}) and decoder ({pytorch_total_decoder_params}): {pytorch_total_encoder_params + pytorch_total_decoder_params}")
 
-    # pytorch_train_encoder_params = sum(p.numel() for p in model.encoder.parameters() if p.requires_grad)
-    # pytorch_train_decoder_params = sum(p.numel() for p in model.decoder.parameters() if p.requires_grad)
-    # print(f"Total number of trainable parameters in encoder ({pytorch_train_encoder_params}) and decoder ({pytorch_train_decoder_params}): {pytorch_train_encoder_params + pytorch_train_decoder_params}")
+    # # pytorch_train_encoder_params = sum(p.numel() for p in model.encoder.parameters() if p.requires_grad)
+    # # pytorch_train_decoder_params = sum(p.numel() for p in model.decoder.parameters() if p.requires_grad)
+    # # print(f"Total number of trainable parameters in encoder ({pytorch_train_encoder_params}) and decoder ({pytorch_train_decoder_params}): {pytorch_train_encoder_params + pytorch_train_decoder_params}")
 
-    before_train_mem = torch.cuda.memory_allocated(opt.device)
-    print(f"Amount of GPU memory allocated in MB before training (approx. 15.000 available): {before_train_mem / 1000000}")
+    # before_train_mem = torch.cuda.memory_allocated(opt.device)
+    # print(f"Amount of GPU memory allocated in MB before training (approx. 15.000 available): {before_train_mem / 1000000}")
 
-    # visualizer = Visualizer(opt)
+    # # visualizer = Visualizer(opt)
 
-    # print('About to start training loop')
+    # # print('About to start training loop')
 
-    start_time = time.time()
+    # start_time = time.time()
 
-    train_losses = []
-    test_losses = []
+    # train_losses = []
+    # test_losses = []
 
-    best_loss = 99
-    for epoch in range(opt.epochs):
-        begin_epoch = time.time()
+    # best_loss = 99
+    # for epoch in range(opt.epochs):
+    #     begin_epoch = time.time()
 
-        epoch_iter = 0
-        train_loss = 0
-        batch_amount = 0
-        for i, data in enumerate(trainloader):
-            # for j, pc in enumerate(input_pc):
-            #     data_idx = (i * 4 + j) // 6
-            #     augment_idx = (i * 4 + j) % 6
-            #     # print(f"Data idx {data_idx} and augmentation idx {augment_idx} in train.py")
+    #     epoch_iter = 0
+    #     train_loss = 0
+    #     batch_amount = 0
+    #     for i, data in enumerate(trainloader):
+    #         # for j, pc in enumerate(input_pc):
+    #         #     data_idx = (i * 4 + j) // 6
+    #         #     augment_idx = (i * 4 + j) % 6
+    #         #     # print(f"Data idx {data_idx} and augmentation idx {augment_idx} in train.py")
 
-            #     header = laspy.LasHeader(point_format=6, version="1.4")
-            #     #header.offsets = np.min(my_data, axis=0)
+    #         #     header = laspy.LasHeader(point_format=6, version="1.4")
+    #         #     #header.offsets = np.min(my_data, axis=0)
 
-            #     # 2. Create a Las
-            #     las = laspy.LasData(header)
+    #         #     # 2. Create a Las
+    #         #     las = laspy.LasData(header)
 
-            #     # print(f"Original pc shape is {pc.shape}")
-            #     # print(f"Pc first 10 is {pc[0][:10]}")
+    #         #     # print(f"Original pc shape is {pc.shape}")
+    #         #     # print(f"Pc first 10 is {pc[0][:10]}")
 
-            #     las.x = pc.numpy()[0] # Array with all x coefficients. [x1, x2, ..., xn]
-            #     las.y = pc.numpy()[1]
-            #     las.z = pc.numpy()[2]
-            #     # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
+    #         #     las.x = pc.numpy()[0] # Array with all x coefficients. [x1, x2, ..., xn]
+    #         #     las.y = pc.numpy()[1]
+    #         #     las.z = pc.numpy()[2]
+    #         #     # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
 
-            #     las.write("original_pc_%d_%d.las" % (data_idx, augment_idx))
+    #         #     las.write("original_pc_%d_%d.las" % (data_idx, augment_idx))
 
-            # continue
-
-
-            # print(f"Getting batch number {i}")
-            iter_start_time = time.time()
-            epoch_iter += opt.batch_size
-
-            # data contains multiple point clouds!
-            # print(f"Data length (==batchsize=4): {len(data)}")
-
-            if opt.dataset=='modelnet' or opt.dataset=='shrec':
-                input_pc, input_sn, input_label, input_node, input_node_knn_I = data
-                model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
-            elif opt.dataset=='shapenet' or opt.dataset=='catenary_arches':
-                # print('Going to unpack the data of a single batch')
-                input_pc, input_sn, input_label, input_node, input_node_knn_I = data # pc, label, som_node, som_knn_I
-                model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
-                if epoch == 0:
-                    after_loading_input_mem = torch.cuda.memory_allocated(opt.device)
-                    print(f"Amount of GPU memory allocated in MB after loading input: {after_loading_input_mem / 1000000}")
-
-            # Check shapes of loaded data.
-            # print(f"Shape of input_pc is (3x4096) {input_pc.shape}")
-            # print(f"Shape of input_sn is (3x4096) {input_sn.shape}")
-            # print(f"Shape of input_node is (3x64) {input_node.shape}")
-            # print(f"Shape of input_node_knn_I is (64x9) {input_node_knn_I.shape}")
-
-            time.sleep(2)
+    #         # continue
 
 
-            batch_amount += input_label.size()[0]
-            # print(f"Input label.size()[0] is {input_label.size()[0]} ")
-            # print('About to optimize the model based on current training batch')
-            model.optimize()
-            # print('After optimizing the model based on current training batch')
+    #         # print(f"Getting batch number {i}")
+    #         iter_start_time = time.time()
+    #         epoch_iter += opt.batch_size
+
+    #         # data contains multiple point clouds!
+    #         # print(f"Data length (==batchsize=4): {len(data)}")
+
+    #         if opt.dataset=='modelnet' or opt.dataset=='shrec':
+    #             input_pc, input_sn, input_label, input_node, input_node_knn_I = data
+    #             model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
+    #         elif opt.dataset=='shapenet' or opt.dataset=='catenary_arches':
+    #             # print('Going to unpack the data of a single batch')
+    #             input_pc, input_sn, input_label, input_node, input_node_knn_I = data # pc, label, som_node, som_knn_I
+    #             model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
+    #             if epoch == 0:
+    #                 after_loading_input_mem = torch.cuda.memory_allocated(opt.device)
+    #                 print(f"Amount of GPU memory allocated in MB after loading input: {after_loading_input_mem / 1000000}")
+
+    #         # Check shapes of loaded data.
+    #         # print(f"Shape of input_pc is (3x4096) {input_pc.shape}")
+    #         # print(f"Shape of input_sn is (3x4096) {input_sn.shape}")
+    #         # print(f"Shape of input_node is (3x64) {input_node.shape}")
+    #         # print(f"Shape of input_node_knn_I is (64x9) {input_node_knn_I.shape}")
+
+    #         time.sleep(2)
 
 
-            train_loss += model.loss.cpu().data * input_label.size()[0]
-
-            # print("After added training loss")
-
-            # if i % 10 == 0:
-                # print/plot errors
-                # t = (time.time() - iter_start_time) / opt.batch_size
-
-                # errors = model.get_current_errors()
-
-                # print(model.test_loss.item())
-                # print(errors)
-                # print()
-
-                # visualizer.print_current_errors(epoch, epoch_iter, errors, t)
-                # visualizer.plot_current_errors(epoch, float(epoch_iter) / dataset_size, opt, errors)
-
-                # print(model.autoencoder.encoder.feature)
-                # visuals = model.get_current_visuals()
-                # visualizer.display_current_results(visuals, epoch, i)
-
-            # Save original and reconstructed point cloud of 1st batch of last epoch to files.
-            if epoch == opt.epochs - 1 and i == 0:
-                input_pred_dict = model.get_current_visuals()
-                input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
-                # print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
-
-                for i in range(len(input_pc)):
-                    # Save original point cloud.
-                    input_data = input_pc[i]
-                    # 1. Create a new header
-                    header = laspy.LasHeader(point_format=6, version="1.4")
-                    #header.offsets = np.min(my_data, axis=0)
-
-                    # 2. Create a Las
-                    las = laspy.LasData(header)
-
-                    las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
-                    las.y = input_data[1]
-                    las.z = input_data[2]
-                    # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
-
-                    las.write("original_pc_train_%d.las" % i)
-
-                    # Save predicted point cloud.
-                    predicted_data = predicted_pc[i]
-                    # 1. Create a new header
-                    header = laspy.LasHeader(point_format=6, version="1.4")
-                    #header.offsets = np.min(my_data, axis=0)
-
-                    # 2. Create a Las
-                    las2 = laspy.LasData(header)
-
-                    las2.x = predicted_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
-                    las2.y = predicted_data[1]
-                    las2.z = predicted_data[2]
-                    # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
-
-                    las2.write("predicted_pc_train_%d.las" % i)
+    #         batch_amount += input_label.size()[0]
+    #         # print(f"Input label.size()[0] is {input_label.size()[0]} ")
+    #         # print('About to optimize the model based on current training batch')
+    #         model.optimize()
+    #         # print('After optimizing the model based on current training batch')
 
 
-        train_loss /= batch_amount
-        # print(f"Batch amount is {batch_amount}")
+    #         train_loss += model.loss.cpu().data * input_label.size()[0]
 
-        train_losses.append(train_loss)
+    #         # print("After added training loss")
 
-        end_train = time.time()
-        print(f"Epoch {epoch} took {end_train-begin_epoch} seconds.")
+    #         # if i % 10 == 0:
+    #             # print/plot errors
+    #             # t = (time.time() - iter_start_time) / opt.batch_size
 
-        # test network
-        if epoch >= 0 and epoch%1==0:
-            with torch.no_grad():
-                batch_amount = 0
-                model.test_loss.data.zero_()
-                test_loss = 0
-                for i, data in enumerate(testloader):
-                    if opt.dataset == 'modelnet' or opt.dataset=='shrec':
-                        input_pc, input_sn, input_label, input_node, input_node_knn_I = data
-                        model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
-                    elif opt.dataset == 'shapenet' or 'catenary_arches':
-                        input_pc, input_sn, input_label, input_node, input_node_knn_I = data
-                        model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
-                    model.test_model()
+    #             # errors = model.get_current_errors()
 
-                    batch_amount += input_label.size()[0]
+    #             # print(model.test_loss.item())
+    #             # print(errors)
+    #             # print()
 
-                    # accumulate loss
-                    # model.test_loss += model.loss_chamfer.detach() * input_label.size()[0]
-                    test_loss += model.loss.cpu().data * input_label.size()[0]
+    #             # visualizer.print_current_errors(epoch, epoch_iter, errors, t)
+    #             # visualizer.plot_current_errors(epoch, float(epoch_iter) / dataset_size, opt, errors)
 
-                    # print(f"TEST: Input_label.size()[0] is {input_label.size()[0]}")
+    #             # print(model.autoencoder.encoder.feature)
+    #             # visuals = model.get_current_visuals()
+    #             # visualizer.display_current_results(visuals, epoch, i)
 
-                # model.test_loss /= batch_amount
-                test_loss /= batch_amount
-                # print(f"TEST: Batch amount is {batch_amount}")
+    #         # Save original and reconstructed point cloud of 1st batch of last epoch to files.
+    #         if epoch == opt.epochs - 1 and i == 0:
+    #             input_pred_dict = model.get_current_visuals()
+    #             input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
+    #             # print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
 
-                # test_losses.append(model.test_loss.cpu().item())
-                test_losses.append(test_loss)
+    #             for i in range(len(input_pc)):
+    #                 # Save original point cloud.
+    #                 input_data = input_pc[i]
+    #                 # 1. Create a new header
+    #                 header = laspy.LasHeader(point_format=6, version="1.4")
+    #                 #header.offsets = np.min(my_data, axis=0)
 
-                if test_loss < best_loss:
-                    best_loss = test_loss
-                # if model.test_loss.item() < best_loss:
-                #     best_loss = model.test_loss.item()
-                print('Tested network. So far lowest loss: %f' % best_loss)
+    #                 # 2. Create a Las
+    #                 las = laspy.LasData(header)
+
+    #                 las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+    #                 las.y = input_data[1]
+    #                 las.z = input_data[2]
+    #                 # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
+
+    #                 las.write("original_pc_train_%d.las" % i)
+
+    #                 # Save predicted point cloud.
+    #                 predicted_data = predicted_pc[i]
+    #                 # 1. Create a new header
+    #                 header = laspy.LasHeader(point_format=6, version="1.4")
+    #                 #header.offsets = np.min(my_data, axis=0)
+
+    #                 # 2. Create a Las
+    #                 las2 = laspy.LasData(header)
+
+    #                 las2.x = predicted_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+    #                 las2.y = predicted_data[1]
+    #                 las2.z = predicted_data[2]
+    #                 # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
+
+    #                 las2.write("predicted_pc_train_%d.las" % i)
+
+
+    #     train_loss /= batch_amount
+    #     # print(f"Batch amount is {batch_amount}")
+
+    #     train_losses.append(train_loss)
+
+    #     end_train = time.time()
+    #     print(f"Epoch {epoch} took {end_train-begin_epoch} seconds.")
+
+    #     # test network
+    #     if epoch >= 0 and epoch%1==0:
+    #         with torch.no_grad():
+    #             batch_amount = 0
+    #             model.test_loss.data.zero_()
+    #             test_loss = 0
+    #             for i, data in enumerate(testloader):
+    #                 if opt.dataset == 'modelnet' or opt.dataset=='shrec':
+    #                     input_pc, input_sn, input_label, input_node, input_node_knn_I = data
+    #                     model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
+    #                 elif opt.dataset == 'shapenet' or 'catenary_arches':
+    #                     input_pc, input_sn, input_label, input_node, input_node_knn_I = data
+    #                     model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
+    #                 model.test_model()
+
+    #                 batch_amount += input_label.size()[0]
+
+    #                 # accumulate loss
+    #                 # model.test_loss += model.loss_chamfer.detach() * input_label.size()[0]
+    #                 test_loss += model.loss.cpu().data * input_label.size()[0]
+
+    #                 # print(f"TEST: Input_label.size()[0] is {input_label.size()[0]}")
+
+    #             # model.test_loss /= batch_amount
+    #             test_loss /= batch_amount
+    #             # print(f"TEST: Batch amount is {batch_amount}")
+
+    #             # test_losses.append(model.test_loss.cpu().item())
+    #             test_losses.append(test_loss)
+
+    #             if test_loss < best_loss:
+    #                 best_loss = test_loss
+    #             # if model.test_loss.item() < best_loss:
+    #             #     best_loss = model.test_loss.item()
+    #             print('Tested network. So far lowest loss: %f' % best_loss)
             
-                # Save predictions and originals inputs of the testset.
-                if epoch == opt.epochs - 1:
-                    input_pred_dict = model.get_current_visuals()
-                    input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
-                    # print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
+    #             # Save predictions and originals inputs of the testset.
+    #             if epoch == opt.epochs - 1:
+    #                 input_pred_dict = model.get_current_visuals()
+    #                 input_pc, predicted_pc = input_pred_dict["input_pc"], input_pred_dict["predicted_pc"]
+    #                 # print(f"Length of input entry is {len(input_pc)} (should be {opt.batch_size})")
 
-                    for i in range(len(input_pc)):
-                        # Save original point cloud.
-                        input_data = input_pc[i]
-                        # 1. Create a new header
-                        header = laspy.LasHeader(point_format=6, version="1.4")
-                        #header.offsets = np.min(my_data, axis=0)
+    #                 for i in range(len(input_pc)):
+    #                     # Save original point cloud.
+    #                     input_data = input_pc[i]
+    #                     # 1. Create a new header
+    #                     header = laspy.LasHeader(point_format=6, version="1.4")
+    #                     #header.offsets = np.min(my_data, axis=0)
 
-                        # 2. Create a Las
-                        las = laspy.LasData(header)
+    #                     # 2. Create a Las
+    #                     las = laspy.LasData(header)
 
-                        las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
-                        las.y = input_data[1]
-                        las.z = input_data[2]
-                        # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
+    #                     las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+    #                     las.y = input_data[1]
+    #                     las.z = input_data[2]
+    #                     # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
 
-                        las.write("original_pc_%d.las" % i)
+    #                     las.write("original_pc_%d.las" % i)
 
-                        # Save predicted point cloud.
-                        predicted_data = predicted_pc[i]
-                        # 1. Create a new header
-                        header = laspy.LasHeader(point_format=6, version="1.4")
-                        #header.offsets = np.min(my_data, axis=0)
+    #                     # Save predicted point cloud.
+    #                     predicted_data = predicted_pc[i]
+    #                     # 1. Create a new header
+    #                     header = laspy.LasHeader(point_format=6, version="1.4")
+    #                     #header.offsets = np.min(my_data, axis=0)
 
-                        # 2. Create a Las
-                        las2 = laspy.LasData(header)
+    #                     # 2. Create a Las
+    #                     las2 = laspy.LasData(header)
 
-                        las2.x = predicted_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
-                        las2.y = predicted_data[1]
-                        las2.z = predicted_data[2]
-                        # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
+    #                     las2.x = predicted_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+    #                     las2.y = predicted_data[1]
+    #                     las2.z = predicted_data[2]
+    #                     # las.classification = predicted_seg.cpu().numpy()[0] # Set labels of every point.
 
-                        las2.write("predicted_pc_%d.las" % i)
+    #                     las2.write("predicted_pc_%d.las" % i)
 
-        end_test = time.time()
-        print(f"Testing after epoch {epoch} took {end_test-end_train} seconds.")
+    #     end_test = time.time()
+    #     print(f"Testing after epoch {epoch} took {end_test-end_train} seconds.")
 
-        # learning rate decay
-        if epoch%opt.lr_decay_step==0 and epoch>0:
-            model.update_learning_rate(opt.lr_decay_rate)
+    #     # learning rate decay
+    #     if epoch%opt.lr_decay_step==0 and epoch>0:
+    #         model.update_learning_rate(opt.lr_decay_rate)
 
-        # save network
-        if epoch%1==0 and epoch>0:
-            print("Saving network...")
-            model.save_network(model.encoder, 'encoder', '%d_%f' % (epoch, model.test_loss.item()), opt.gpu_id)
-            model.save_network(model.decoder, 'decoder', '%d_%f' % (epoch, model.test_loss.item()), opt.gpu_id)
+    #     # save network
+    #     if epoch%1==0 and epoch>0:
+    #         print("Saving network...")
+    #         model.save_network(model.encoder, 'encoder', '%d_%f' % (epoch, model.test_loss.item()), opt.gpu_id)
+    #         model.save_network(model.decoder, 'decoder', '%d_%f' % (epoch, model.test_loss.item()), opt.gpu_id)
 
-    print(f"Length of all training losses should be equal to number of epochs ({opt.epochs}): {len(train_losses)}")
-    print(f"Length of all test losses should be equal to number of epochs ({opt.epochs}): {len(test_losses)}")
+    # print(f"Length of all training losses should be equal to number of epochs ({opt.epochs}): {len(train_losses)}")
+    # print(f"Length of all test losses should be equal to number of epochs ({opt.epochs}): {len(test_losses)}")
 
-    print("Train losses: ", train_losses)
-    print("Test losses: ", test_losses)
+    # print("Train losses: ", train_losses)
+    # print("Test losses: ", test_losses)
 
-    plot_train_test_loss(opt.epochs, train_losses, test_losses)
+    # plot_train_test_loss(opt.epochs, train_losses, test_losses)
 
 
 # Get full dataset and then split in train- and testloader.
