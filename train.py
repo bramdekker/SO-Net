@@ -336,8 +336,8 @@ def main():
     print(f"Average lowest test loss is {avg_lowest_test_loss}")
 
     # TODO: shapes are not equal!!
-    avg_train_losses = np.average(np.array(train_losses), axis=1) # should be 25 x 1
-    avg_test_losses = np.average(np.array(test_losses), axis=1)
+    avg_train_losses = np.average(np.array(train_losses), axis=0) # should be 25 x 1
+    avg_test_losses = np.average(np.array(test_losses), axis=0)
 
     plot_train_test_loss(opt.epochs, avg_train_losses, avg_test_losses)
 
