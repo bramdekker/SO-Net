@@ -232,7 +232,9 @@ def train_model(model, dataset, epoch, opt):
 
     # Print approx time for epoch once.
     if epoch == 0:
-        print(f"A training epoch {epoch} takes approx {int(end_train-begin_epoch)} seconds.")
+        epoch_time = end_train - begin_epoch
+        print(f"A training epoch takes approx {int(epoch_time)} seconds.")
+        print(f"Total taining time will be approx. {int(opt.avg_rounds * opt.epochs * epoch_time)} minutes.")
 
     return train_loss
     
@@ -254,10 +256,10 @@ def test_model(model, dataset, epoch, opt):
             input_pc, input_sn, input_label, input_node, input_node_knn_I = data # pc, sn, label, som_node, som_knn_I
             model.set_input(input_pc, input_sn, input_label, input_node, input_node_knn_I)
 
-            # Print out memory for 1st epoch.
-            if epoch == 0:
-                after_loading_input_mem = torch.cuda.memory_allocated(opt.device)
-                print(f"Amount of GPU memory allocated in MB after loading input: {after_loading_input_mem / 1000000}")
+            # # Print out memory for 1st epoch.
+            # if epoch == 0:
+            #     after_loading_input_mem = torch.cuda.memory_allocated(opt.device)
+            #     print(f"Amount of GPU memory allocated in MB after loading input: {after_loading_input_mem / 1000000}")
 
             # Get the number of samples in current batch.
             batch_amount += input_label.size()[0]
@@ -279,7 +281,9 @@ def test_model(model, dataset, epoch, opt):
 
         # Print approx time for epoch once.
         if epoch == 0:
-            print(f"A training epoch {epoch} takes approx {int(end_train-begin_epoch)} seconds.")
+            epoch_time = end_train - begin_epoch
+            print(f"A test epoch takes approx {int(epoch_time)} seconds.")
+            print(f"Total testing time will be approx. {int(opt.avg_rounds * opt.epochs * epoch_time)} minutes.")
 
         return test_loss
 
@@ -328,7 +332,7 @@ def main():
     avg_train_losses = np.average(np.array(train_losses), axis=1)
     avg_test_losses = np.average(np.array(test_losses), axis=1)
 
-    plot_train_test_loss(range(opt.epochs), avg_train_losses, avg_test_losses)
+    plot_train_test_loss(opt.epochs, avg_train_losses, avg_test_losses)
 
 
     # """Main function that executes the regular training and testing."""
