@@ -236,7 +236,7 @@ def train_model(model, dataset, epoch, opt):
         print(f"A training epoch takes approx {int(epoch_time)} seconds.")
         print(f"Total taining time will be approx. {int(opt.avg_rounds * opt.epochs * epoch_time)} minutes.")
 
-    return train_loss
+    return train_loss.item()
     
 
 def test_model(model, dataset, epoch, opt):
@@ -285,7 +285,7 @@ def test_model(model, dataset, epoch, opt):
             print(f"A test epoch takes approx {int(epoch_time)} seconds.")
             print(f"Total testing time will be approx. {int(opt.avg_rounds * opt.epochs * epoch_time)} minutes.")
 
-        return test_loss
+        return test_loss.item()
 
 
 def main():
