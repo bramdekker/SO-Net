@@ -297,12 +297,8 @@ def main():
     
     dataset = ArchesLoader(opt.dataroot, 'all', opt)
 
-    training_size = int(train_frac * len(dataset))
-    test_size = int(test_frac * len(dataset))
-    print(f"Size of the full dataset is {len(dataset)}")
-    print(f"Size of training set is rounded to {int(train_frac * len(dataset))}, but exactly {train_frac * len(dataset)}")
-    print(f"Size of test set is rounded to {int(test_frac * len(dataset))}, but exactly {test_frac * len(dataset)}")
-    print(f"Maybe use ceil and floor to get {math.ceil(train_frac * len(dataset))} and {math.floor(test_frac * len(dataset))} for train and test resp.")
+    training_size = round(train_frac * len(dataset))
+    test_size = round(test_frac * len(dataset))
 
     # For every experiment, record lowest loss, all test losses and train losses. Losses are averages per epoch.
     # Lowest loss shape = (opt.avg_rounds) -> Avg lowest loss
