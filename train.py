@@ -146,10 +146,10 @@ def train_loocv(opt):
             if epoch % opt.lr_decay_step == 0 and epoch > 0:
                 model.update_learning_rate(opt.lr_decay_rate)
 
-            # # save network
-            # if epoch%1==0 and epoch>0:
-            #     print("Saving network...")
-            #     model.save_network(model.encoder, 'encoder', '%d_%f' % (epoch, model.test_loss.item()), opt.gpu_id)
+            # save network
+            if epoch%1==0 and epoch>0:
+                print("Saving network...")
+                model.save_network(model.encoder, 'encoder', '%d_%f' % (epoch, model.test_loss.item()), opt.gpu_id)
             #     model.save_network(model.decoder, 'decoder', '%d_%f' % (epoch, model.test_loss.item()), opt.gpu_id)
 
 
@@ -312,6 +312,8 @@ def main():
         train_losses_round = []
         test_losses_round = []
 
+        best_test_loss = 0.5
+
         for i in range(opt.epochs):
             # Train models and record training losses
             train_loss_round = train_model(ae_model, train_dataset, i, opt)
@@ -320,6 +322,12 @@ def main():
             # Test model and record test losses
             test_loss_round = test_model(ae_model, test_dataset, i, opt)
             test_losses_round.append(test_loss_round)
+
+            if test_loss_round < best_test_loss:
+                best_test_loss = test_loss_round
+                print("Saving network...")
+                ae_model.save_network(ae_model.encoder, 'encoder', 'boxes_3_%d_%f' % (i, ae_model.test_loss.item()), opt.gpu_id)
+
 
         print(f"train_losses from this round are (number of epochs length): {train_losses_round}")
         print(f"test_losses from this round are (number of epochs length): {test_losses_round}")

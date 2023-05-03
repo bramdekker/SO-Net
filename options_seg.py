@@ -17,6 +17,12 @@ class Options():
         self.parser.add_argument('--name', type=str, default='train', help='name of the experiment. It decides where to store samples and models')
         self.parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints', help='models are saved here')
 
+        self.parser.add_argument('--avg_rounds', type=int, default=10, help="number of averaging rounds for the experiment")
+        self.parser.add_argument('--train_fraction', type=float, default=0.8, help="fraction of dataset used for training")
+        self.parser.add_argument('--save_train_pcs', action="store_true", help="save first batch of last epoch of training as point clouds")
+        self.parser.add_argument('--save_test_pcs', action="store_true", help="save first batch of last epoch of testing as point clouds")
+
+        self.parser.add_argument('--epochs', type=int, default=5, help='number of training epochs')
         self.parser.add_argument('--batch_size', type=int, default=8, help='input batch size')
         self.parser.add_argument('--input_pc_num', type=int, default=1024, help='# of input points')
         self.parser.add_argument('--surface_normal', type=bool, default=True, help='use surface normal in the pc input')
