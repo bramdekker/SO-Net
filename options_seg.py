@@ -11,11 +11,13 @@ class Options():
     def initialize(self):
         self.parser.add_argument('--gpu_id', type=int, default=0, help='gpu id: e.g. 0, 1. -1 is no GPU')
 
-        self.parser.add_argument('--dataset', type=str, default='shapenet', help='shapenet')
+        self.parser.add_argument('--dataset', type=str, default='catenary_arches', help='modelnet / shrec / shapenet')
         self.parser.add_argument('--dataroot', default='/ssd/dataset/shapenetcore_partanno_segmentation_benchmark_v0_normal/', help='path to images & laser point clouds')
-        self.parser.add_argument('--classes', type=int, default=50, help='ModelNet40 or ModelNet10')
-        self.parser.add_argument('--name', type=str, default='train', help='name of the experiment. It decides where to store samples and models')
+        self.parser.add_argument('--classes', type=int, default=14, help='ModelNet40 or ModelNet10')
+        self.parser.add_argument('--name', type=str, default='train_boxes_3_3_3', help='name of the experiment. It decides where to store samples and models')
         self.parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints', help='models are saved here')
+        self.parser.add_argument('--cluster_save_dir', type=str, default='./test_clustering', help='cluster results are saved here')
+        
 
         self.parser.add_argument('--avg_rounds', type=int, default=10, help="number of averaging rounds for the experiment")
         self.parser.add_argument('--train_fraction', type=float, default=0.8, help="fraction of dataset used for training")
@@ -36,7 +38,9 @@ class Options():
         self.parser.add_argument('--normalization', type=str, default='batch', help='normalization function: batch, instance')
 
         self.parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
-        self.parser.add_argument('--dropout', type=float, default=0.6, help='probability of an element to be zeroed')
+        self.parser.add_argument('--lr_decay_step', type=float, default=100, help='after how many epochs lr is reduced')
+        self.parser.add_argument('--lr_decay_rate', type=float, default=0.5, help='rate of the lr decay')
+        self.parser.add_argument('--dropout', type=float, default=0.5, help='probability of an element to be zeroed')
         self.parser.add_argument('--node_num', type=int, default=64, help='som node number')
         self.parser.add_argument('--k', type=int, default=3, help='k nearest neighbor')
         # '/ssd/open-source/so-net-full/autoencoder/checkpoints/save/shapenetpart/183_0.034180_net_encoder.pth'
@@ -44,7 +48,7 @@ class Options():
         self.parser.add_argument('--pretrain_lr_ratio', type=float, default=1, help='learning rate ratio between pretrained encoder and classifier')
 
         self.parser.add_argument('--som_k', type=int, default=9, help='k nearest neighbor of SOM nodes searching on SOM nodes')
-        self.parser.add_argument('--som_k_type', type=str, default='center', help='avg / center')
+        self.parser.add_argument('--som_k_type', type=str, default='avg', help='avg / center')
 
         self.parser.add_argument('--random_pc_dropout_lower_limit', type=float, default=1, help='keep ratio lower limit')
         self.parser.add_argument('--bn_momentum', type=float, default=0.1, help='normalization momentum, typically 0.1. Equal to (1-m) in TF')
