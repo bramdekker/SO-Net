@@ -200,7 +200,11 @@ class ArchesLoader(data.Dataset):
 
         if self.opt.surface_normal and 'sn' in data.files:
             sn_np = data['sn']
-        # seg_np = data['part_label']
+
+        label_np = np.ones((pc_np.shape[1]))
+        if 'labels' in data.files:
+            label_np = data['labels']
+            
         som_node_np = data['som_node'] # 3 x 64 (node_num)
 
         # if index == 0:
@@ -210,7 +214,7 @@ class ArchesLoader(data.Dataset):
         # som_node_np = np.transpose(data['som_node']) #3x64
         # print(f"Inital som_node_np shape is {som_node_np.shape}")
 
-        label = 1 # dummy value, always 1
+        # label = 1 # dummy value, always 1
         # label = self.folders.index(file[0:8])
         # assert(label >= 0)
 
@@ -222,7 +226,7 @@ class ArchesLoader(data.Dataset):
             # pc_np = pc_np[chosen_idx, :]
             pc_np = pc_np[:, chosen_idx]
             sn_np = sn_np[:, chosen_idx]
-            # seg_np = seg_np[chosen_idx]
+            label_np = label_np[chosen_idx]
         else:
             # print(f"In else: pc_np.shape: {pc_np.shape}")
             chosen_idx = np.random.choice(pc_np.shape[1], self.opt.input_pc_num-pc_np.shape[1], replace=True)
@@ -230,10 +234,10 @@ class ArchesLoader(data.Dataset):
             pc_np_redundent = pc_np[:, chosen_idx]
             # print(f"The type of sn_np is {type(sn_np)}")
             sn_np_redundent = sn_np[:, chosen_idx]
-            # seg_np_redundent = seg_np[chosen_idx]
+            label_np_redundent = label_np[chosen_idx]
             pc_np = np.concatenate((pc_np, pc_np_redundent), axis=1) # Ux3 concat Vx3 -> Nx3
             sn_np = np.concatenate((sn_np, sn_np_redundent), axis=1)
-            # seg_np = np.concatenate((seg_np, seg_np_redundent), axis=0)
+            label_np = np.concatenate((label_np, label_np_redundent), axis=0)
 
         # print(f"Shape just before augmentation is {pc_np.shape}")
 
@@ -297,7 +301,7 @@ class ArchesLoader(data.Dataset):
         # convert to tensor
         pc = torch.from_numpy(pc_np.astype(np.float32))  # 3xN
         sn = torch.from_numpy(sn_np.astype(np.float32))  # 3xN
-        # seg = torch.from_numpy(seg_np.astype(np.int64))  # N
+        labels = torch.from_numpy(label_np.astype(np.int64))  # N
 
         # som
         som_node = torch.from_numpy(som_node_np.astype(np.float32))  # 3xnode_num
@@ -317,7 +321,7 @@ class ArchesLoader(data.Dataset):
 
         # print(f"Final shape of pc is {pc.shape}. Index is {augmentation_idx}")
 
-        return pc, sn, label, som_node, som_knn_I
+        return pc, sn, labels, som_node, som_knn_I
 
 
 

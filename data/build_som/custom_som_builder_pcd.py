@@ -23,12 +23,13 @@ def som_saver_catenary_arches(root, rows, cols, gpu_ids, output_root):
         pc_np = f_pcd.point.positions.numpy().T # 3xN tensor -> [[x0, ..., xn], [y0, ..., yn, [z0, ..., zn]]]
         # pc_np = np.vstack((f_las.x, f_las.y, f_las.z)) # 3xN tensor -> [[x0, ..., xn], [y0, ..., yn, [z0, ..., zn]]]
         # pc_np = np.transpose(pc_np) # Nx3 array -> [[x0, y0, z0], ..., [xn, yn, zn]]
-        print(pc_np.shape)
 
         sn_np = f_pcd.point.normals.numpy().T
 
-        print(sn_np.shape)
-
+        label_np = np.ones((pc_np.shape[1]))
+        if hasattr(f_pcd.point, "labels"):
+            label_np = f_pcd.label
+        
         # Downsample point cloud to take 524288 random points.
         pc_sampled = pc_np[:, np.random.choice(pc_np.shape[1], 1024, replace=False)] # 3 x sample_size
         pc = torch.from_numpy(pc_sampled).cuda()
@@ -39,7 +40,7 @@ def som_saver_catenary_arches(root, rows, cols, gpu_ids, output_root):
         
         # Save file as npz
         npz_file = os.path.join(output_root, f[0:-4]+'.npz')
-        np.savez(npz_file, pc=pc_np, sn=sn_np, som_node=som_node_np) # sn = surface normal
+        np.savez(npz_file, pc=pc_np, sn=sn_np, labels=label_np, som_node=som_node_np) # sn = surface normal
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

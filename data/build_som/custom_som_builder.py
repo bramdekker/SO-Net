@@ -19,6 +19,13 @@ def som_saver_catenary_arches(root, rows, cols, gpu_ids, output_root):
         # Read las point cloud into array -> [[x0, ..., xn], [y0, ..., yn, [z0, ..., zn]]]
         f_las = laspy.read(os.path.join(root, f))
         pc_np = np.vstack((f_las.x, f_las.y, f_las.z)) # 3xN tensor -> [[x0, ..., xn], [y0, ..., yn, [z0, ..., zn]]]
+        
+        label_np = np.ones((pc_np.shape[1]))
+        if hasattr(f_las, "label"):
+            label_np = f_las.label
+        elif hasattr(f_las, "classification"):
+            label_np = f_las.classification
+        
         # pc_np = np.transpose(pc_np) # Nx3 array -> [[x0, y0, z0], ..., [xn, yn, zn]]
 
         # Downsample point cloud to take 524288 random points.
@@ -32,7 +39,7 @@ def som_saver_catenary_arches(root, rows, cols, gpu_ids, output_root):
         
         # Save file as npz
         npz_file = os.path.join(output_root, f[0:-4]+'.npz')
-        np.savez(npz_file, pc=pc_np, som_node=som_node_np) # sn = surface normal
+        np.savez(npz_file, pc=pc_np, labels=label_np, som_node=som_node_np) # sn = surface normal
 
 if __name__ == "__main__":
     rows, cols = 4, 4
