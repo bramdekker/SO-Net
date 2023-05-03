@@ -22,9 +22,9 @@ def som_saver_catenary_arches(root, rows, cols, gpu_ids, output_root):
         
         label_np = np.ones((pc_np.shape[1]))
         if hasattr(f_las, "label"):
-            label_np = f_las.label
+            label_np = np.asarray(f_las.label)
         elif hasattr(f_las, "classification"):
-            label_np = f_las.classification
+            label_np = np.asarray(f_las.classification)
         
         # pc_np = np.transpose(pc_np) # Nx3 array -> [[x0, y0, z0], ..., [xn, yn, zn]]
 
