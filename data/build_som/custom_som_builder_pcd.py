@@ -28,7 +28,7 @@ def som_saver_catenary_arches(root, rows, cols, gpu_ids, output_root):
 
         label_np = np.ones((pc_np.shape[1]))
         if hasattr(f_pcd.point, "labels"):
-            label_np = f_pcd.label
+            label_np = f_pcd.point.labels
         
         # Downsample point cloud to take 524288 random points.
         pc_sampled = pc_np[:, np.random.choice(pc_np.shape[1], 1024, replace=False)] # 3 x sample_size
