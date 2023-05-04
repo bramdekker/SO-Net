@@ -75,8 +75,12 @@ class Model():
         self.sn = self.input_sn.detach()
         self.seg = self.input_seg.detach()
 
+        print(f"Number of nonzero elements is {torch.count_nonzero(self.seg)}")
         print(f"Shape of self.seg is {self.seg.shape}. First 2 entries of self.seg are {self.seg[:2]}.")
         # self.label = self.input_label.detach()
+
+        # Remove one dimension.
+        self.seg = torch.squeeze(self.seg)
 
     def forward(self, is_train=False, epoch=None):
         # ------------------------------------------------------------------
