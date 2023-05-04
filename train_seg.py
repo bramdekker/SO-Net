@@ -22,9 +22,45 @@ from models.segmenter import Model
 from data.arches_loader import ArchesLoader
 
 
+def avg(l):
+    return sum(l) / len(l)
+
+def get_overall_acc(conf_matrix):
+    total = 0
+    truth = 0
+
+    dim = conf_matrix.shape[0]
+
+    for i in range(dim):
+        for j in range(dim):
+            if i == j:
+                truth += conf_matrix[i][j]
+            
+            total += conf_matrix[i][j]
+
+    return truth / total
+
+def get_iou(conf_matrix):
+    dim = conf_matrix.shape[0]
+
+    ious = []
+
+    for cl in range(dim):
+        tp = conf_matrix[cl][cl]
+
+        falses = 0
+        for j in range(dim):
+            if j != cl:
+                falses += conf_matrix[cl][j]
+                falses += conf_matrix[j][cl]
+
+        ious.append(tp / (tp + falses))
+
+    return avg(ious)
+
 def cluster_dataset(model, save_dir, opt):
     dataset = ArchesLoader(opt.dataroot, 'all', opt)
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
 
     for i, data in enumerate(dataloader):
         # Get prediction for this batch
@@ -50,7 +86,8 @@ def cluster_dataset(model, save_dir, opt):
             metric = MulticlassConfusionMatrix(opt.classes)
 
             metric.update(predicted_seg.cpu().squeeze(), input_seg.squeeze())
-            print(metric.compute())
+            conf_matrix = metric.compute()
+            print(f"Overall accuracy is {get_overall_acc(conf_matrix)} and the mean IoU is {get_iou(conf_matrix)}")
 
 
 
