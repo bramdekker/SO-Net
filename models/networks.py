@@ -261,7 +261,8 @@ class Segmenter(nn.Module):
         self.drop4 = nn.Dropout(p=self.opt.dropout)
         self.layer5 = EquivariantLayer(128, self.opt.classes, activation=None, normalization=None)
 
-    def forward(self, x_decentered, x, centers, sn, label,
+    # Label is not need for segmentation.
+    def forward(self, x_decentered, x, centers, sn, # label,
                 first_pn_out,
                 feature_max_first_pn_out,
                 feature_max_knn_feature_1,
@@ -294,36 +295,36 @@ class Segmenter(nn.Module):
         x = torch.cat(tuple(x_list), dim=2)
         sn = torch.cat(tuple(sn_list), dim=2)
 
-        label_onehot = torch.FloatTensor(B, 16).zero_().to(self.opt.device)  # Bx16
-        label_onehot.scatter_(1, label.unsqueeze(1), 1)  # Bx16
-        label_onehot = label_onehot.unsqueeze(2).expand(B, 16, kN).detach()  # Bx16xkN
+        # label_onehot = torch.FloatTensor(B, 16).zero_().to(self.opt.device)  # Bx16
+        # label_onehot.scatter_(1, label.unsqueeze(1), 1)  # Bx16
+        # label_onehot = label_onehot.unsqueeze(2).expand(B, 16, kN).detach()  # Bx16xkN
 
         feature_expanded = feature.unsqueeze(2).expand(B, self.feature_num, kN)
 
         if self.opt.surface_normal == True:
             if self.opt.som_k >= 2:
-                layer1_in = torch.cat((x_decentered, x, centers, sn, label_onehot,
+                layer1_in = torch.cat((x_decentered, x, centers, sn, # label_onehot,
                                        first_pn_out,
                                        feature_max_first_pn_out,
                                        feature_max_knn_feature_1,
                                        feature_max_final_pn_out,
                                        feature_expanded), dim=1)
             else:
-                layer1_in = torch.cat((x_decentered, x, centers, sn, label_onehot,
+                layer1_in = torch.cat((x_decentered, x, centers, sn, # label_onehot,
                                        first_pn_out,
                                        feature_max_first_pn_out,
                                        feature_max_final_pn_out,
                                        feature_expanded), dim=1)
         else:
             if self.opt.som_k >= 2:
-                layer1_in = torch.cat((x_decentered, x, centers, label_onehot,
+                layer1_in = torch.cat((x_decentered, x, centers, # label_onehot,
                                        first_pn_out,
                                        feature_max_first_pn_out,
                                        feature_max_knn_feature_1,
                                        feature_max_final_pn_out,
                                        feature_expanded), dim=1)
             else:
-                layer1_in = torch.cat((x_decentered, x, centers, label_onehot,
+                layer1_in = torch.cat((x_decentered, x, centers, # label_onehot,
                                        first_pn_out,
                                        feature_max_first_pn_out,
                                        feature_max_final_pn_out,

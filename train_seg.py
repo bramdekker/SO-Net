@@ -27,8 +27,8 @@ def cluster_dataset(model, save_dir):
 
     for data in enumerate(dataloader):
         # Get prediction for this batch
-        input_pc, input_sn, input_label, input_seg, input_node, input_node_knn_I = data
-        model.set_input(input_pc, input_sn, input_label, input_seg, input_node, input_node_knn_I)
+        input_pc, input_sn, input_seg, input_node, input_node_knn_I = data #input_label, 
+        model.set_input(input_pc, input_sn, input_seg, input_node, input_node_knn_I) #input_label, 
 
         # Save all prediction per sample to separate file.
         model.test_model()

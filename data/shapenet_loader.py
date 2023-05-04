@@ -136,7 +136,7 @@ class ShapeNetLoader(data.Dataset):
         sn_np = data['sn']
         seg_np = data['part_label']
         som_node_np = data['som_node']
-        label = self.folders.index(file[0:8])
+        label = self.folders.index(file[0:8]) # Class label for classification.
         assert(label >= 0)
 
         if self.opt.input_pc_num < pc_np.shape[0]:

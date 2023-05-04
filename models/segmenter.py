@@ -43,7 +43,7 @@ class Model():
         # place holder for GPU tensors
         self.input_pc = torch.FloatTensor(self.opt.batch_size, 3, self.opt.input_pc_num).uniform_()
         self.input_sn = torch.FloatTensor(self.opt.batch_size, 3, self.opt.input_pc_num).uniform_()
-        self.input_label = torch.LongTensor(self.opt.batch_size).fill_(1)
+        # self.input_label = torch.LongTensor(self.opt.batch_size).fill_(1)
         self.input_seg = torch.LongTensor(self.opt.batch_size, 50).fill_(1)
         self.input_node = torch.FloatTensor(self.opt.batch_size, 3, self.opt.node_num)
         self.input_node_knn_I = torch.LongTensor(self.opt.batch_size, self.opt.node_num, self.opt.som_k)
@@ -56,7 +56,7 @@ class Model():
         if self.opt.gpu_id >= 0:
             self.input_pc = self.input_pc.to(self.opt.device)
             self.input_sn = self.input_sn.to(self.opt.device)
-            self.input_label = self.input_label.to(self.opt.device)
+            # self.input_label = self.input_label.to(self.opt.device)
             self.input_seg = self.input_seg.to(self.opt.device)
             self.input_node = self.input_node.to(self.opt.device)
             self.input_node_knn_I = self.input_node_knn_I.to(self.opt.device)
@@ -64,17 +64,17 @@ class Model():
             self.test_accuracy_segmenter = self.test_accuracy_segmenter.to(self.opt.device)
 
 
-    def set_input(self, input_pc, input_sn, input_label, input_seg, input_node, input_node_knn_I):
+    def set_input(self, input_pc, input_sn, input_seg, input_node, input_node_knn_I): # input_label, 
         self.input_pc.resize_(input_pc.size()).copy_(input_pc)
         self.input_sn.resize_(input_sn.size()).copy_(input_sn)
-        self.input_label.resize_(input_label.size()).copy_(input_label)
+        # self.input_label.resize_(input_label.size()).copy_(input_label)
         self.input_seg.resize_(input_seg.size()).copy_(input_seg)
         self.input_node.resize_(input_node.size()).copy_(input_node)
         self.input_node_knn_I.resize_(input_node_knn_I.size()).copy_(input_node_knn_I)
         self.pc = self.input_pc.detach()
         self.sn = self.input_sn.detach()
         self.seg = self.input_seg.detach()
-        self.label = self.input_label.detach()
+        # self.label = self.input_label.detach()
 
     def forward(self, is_train=False, epoch=None):
         # ------------------------------------------------------------------
@@ -101,12 +101,11 @@ class Model():
                                               self.pc,
                                               self.encoder.centers,
                                               self.sn,
-                                              self.input_label,
                                               self.encoder.first_pn_out,
                                               feature_max_first_pn_out,
                                               feature_max_knn_feature_1,
                                               feature_max_final_pn_out,
-                                              self.feature)
+                                              self.feature) # self.input_label,
 
     def optimize(self, epoch=None):
         self.encoder.train()
