@@ -44,7 +44,7 @@ class Model():
         self.input_pc = torch.FloatTensor(self.opt.batch_size, 3, self.opt.input_pc_num).uniform_()
         self.input_sn = torch.FloatTensor(self.opt.batch_size, 3, self.opt.input_pc_num).uniform_()
         # self.input_label = torch.LongTensor(self.opt.batch_size).fill_(1)
-        self.input_seg = torch.LongTensor(self.opt.batch_size, 50).fill_(1)
+        self.input_seg = torch.LongTensor(self.opt.batch_size, self.opt.classes).fill_(1)
         self.input_node = torch.FloatTensor(self.opt.batch_size, 3, self.opt.node_num)
         self.input_node_knn_I = torch.LongTensor(self.opt.batch_size, self.opt.node_num, self.opt.som_k)
 
@@ -74,6 +74,8 @@ class Model():
         self.pc = self.input_pc.detach()
         self.sn = self.input_sn.detach()
         self.seg = self.input_seg.detach()
+
+        print(f"Shape of self.seg is {self.seg.shape}. First 2 entries of self.seg are {self.seg[:2]}.")
         # self.label = self.input_label.detach()
 
     def forward(self, is_train=False, epoch=None):
