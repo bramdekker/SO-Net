@@ -80,9 +80,10 @@ class Model():
         # self.seg = torch.squeeze(self.seg)
 
         print(f"Number of nonzero elements is {torch.count_nonzero(self.seg.data)}")
+        print(f"The dtype of self.seg is {self.seg.dtype}")
         print(f"Shape of self.seg is {self.seg.shape}. First 2 entries of self.seg are {self.seg.data[:2]}.")
 
-        assert(np.logical_and(np.all(self.seg.data >= 0), np.all(self.seg.data < self.opt.classes + 3)))
+        assert(np.logical_and(np.all(np.asarray(self.seg.data) >= 0), np.all(np.asarray(self.seg.data) < self.opt.classes + 3)))
         # self.label = self.input_label.detach()
 
 
