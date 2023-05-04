@@ -33,9 +33,9 @@ def cluster_dataset(model, save_dir):
         # Save all prediction per sample to separate file.
         model.test_model()
 
-        print(model.score_segmenter.data[:2])
+        print(model.score_segmenter.data.shape)
         _, predicted_seg = torch.max(model.score_segmenter.data, dim=1, keepdim=False)
-        print()
+        print(predicted_seg[:2])
 
 
 

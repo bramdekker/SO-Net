@@ -205,6 +205,8 @@ class ArchesLoader(data.Dataset):
         if 'labels' in data.files:
             label_np = np.squeeze(data['labels'])
 
+        assert(np.logical_and(label_np >= 0, label_np < self.opt.classes + 3))
+
         som_node_np = data['som_node'] # 3 x 64 (node_num)
 
         # if index == 0:
