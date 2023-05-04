@@ -241,14 +241,14 @@ class Segmenter(nn.Module):
         # segmenter
         if self.opt.surface_normal == True:
             if self.opt.som_k >= 2:
-                in_channels = 3 + 3 + 3 + 3 + 16 + 384 + 384 + 512 + self.feature_num * 2
+                in_channels = 3 + 3 + 3 + 3 + 384 + 384 + 512 + self.feature_num * 2 # remove the +16 because that is the class labels from shapenet
             else:
-                in_channels = 3 + 3 + 3 + 3 + 16 + 384 + 384 + self.feature_num * 2
+                in_channels = 3 + 3 + 3 + 3 + 384 + 384 + self.feature_num * 2
         else:
             if self.opt.som_k >= 2:
-                in_channels = 3 + 3 + 3 + 16 + 384 + 384 + 512 + self.feature_num * 2
+                in_channels = 3 + 3 + 3 + 384 + 384 + 512 + self.feature_num * 2
             else:
-                in_channels = 3 + 3 + 3 + 16 + 384 + 384 + self.feature_num * 2
+                in_channels = 3 + 3 + 3 + 384 + 384 + self.feature_num * 2
 
         self.layer1 = EquivariantLayer(in_channels,
                                        1024,
