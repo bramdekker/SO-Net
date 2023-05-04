@@ -204,7 +204,7 @@ class ArchesLoader(data.Dataset):
         label_np = np.ones((pc_np.shape[1]))
         if 'labels' in data.files:
             label_np = np.squeeze(data['labels'])
-            
+
         som_node_np = data['som_node'] # 3 x 64 (node_num)
 
         # if index == 0:
@@ -240,7 +240,7 @@ class ArchesLoader(data.Dataset):
             label_np = np.concatenate((label_np, label_np_redundent), axis=0)
 
         # print(f"Shape just before augmentation is {pc_np.shape}")
-        print(f"shape of label_np is {label_np.shape} (should be N == 8192)")
+        # print(f"shape of label_np is {label_np.shape} (should be N == 8192)")
 
         # print("Just after downsampling")
         # augmentation

@@ -134,9 +134,13 @@ class Model():
         self.segmenter.eval()
         self.forward(is_train=False)
 
-        print(f"Output of the segmenter has shape {self.score_segmenter.shape}")
+        print(f"Param inputs for softmax_segmenter has shape {self.score_segmenter.shape}")
+        print(f"Param targets for softmax_segmenter has shape {self.seg.shape}")
 
         # self.loss_classifier = self.softmax_classifier(self.score_classifier, self.label)
+
+        # :param inputs: BxclassxN == 8 x 14 x 8192
+        # :param targets: BxN == 8 x 8192
         self.loss_segmenter = self.softmax_segmenter(self.score_segmenter, self.seg)
         self.loss = self.loss_segmenter
 
