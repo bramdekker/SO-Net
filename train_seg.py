@@ -34,7 +34,7 @@ def cluster_dataset(model, save_dir):
         model.test_model()
 
         print(f"The shape of the data in model.score_segmenter is {model.score_segmenter.data.shape}") # BxCxN
-        print(f"The first batch entry the first index is {model.score_segmenter.data[0][0]}") 
+        print(f"The first batch entry the first index has length {model.score_segmenter.data[0][0].size()} and looks like {model.score_segmenter.data[0][0]}") 
         # _, predicted_seg = torch.max(model.score_segmenter.data, dim=2, keepdim=False) 
         # print(f"The first two predictions are {predicted_seg[:2]}")
 
