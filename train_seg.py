@@ -46,10 +46,10 @@ def cluster_dataset(model, save_dir, opt):
         # TODO: Calculate mIoU
         if i == 0:
             print(f"Shape of predicted_seg is {predicted_seg.shape} and shape of input_seg is {input_seg.shape}")
-
+            print(f"Predicted seg device is {predicted_seg.get_device()}, input_seg device is {input_seg.get_device()}")
             metric = MulticlassConfusionMatrix(opt.classes)
 
-            metric.update(predicted_seg.squeeze(), input_seg.cpu().squeeze())
+            metric.update(predicted_seg.squeeze(), input_seg.squeeze())
             print(metric.compute())
 
 
