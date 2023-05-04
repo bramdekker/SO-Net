@@ -240,6 +240,7 @@ class ArchesLoader(data.Dataset):
             label_np = np.concatenate((label_np, label_np_redundent), axis=0)
 
         # print(f"Shape just before augmentation is {pc_np.shape}")
+        print(f"shape of label_np is {label_np.shape} (should be N == 8192)")
 
         # print("Just after downsampling")
         # augmentation
