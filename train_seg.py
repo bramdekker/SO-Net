@@ -34,9 +34,9 @@ def get_overall_acc(conf_matrix):
     for i in range(dim):
         for j in range(dim):
             if i == j:
-                truth += conf_matrix[i][j]
+                truth += conf_matrix.data[i][j]
             
-            total += conf_matrix[i][j]
+            total += conf_matrix.data[i][j]
 
     return truth / total
 
@@ -46,13 +46,13 @@ def get_iou(conf_matrix):
     ious = []
 
     for cl in range(dim):
-        tp = conf_matrix[cl][cl]
+        tp = conf_matrix.data[cl][cl]
 
         falses = 0
         for j in range(dim):
             if j != cl:
-                falses += conf_matrix[cl][j]
-                falses += conf_matrix[j][cl]
+                falses += conf_matrix.data[cl][j]
+                falses += conf_matrix.data[j][cl]
 
         ious.append(tp / (tp + falses))
 
