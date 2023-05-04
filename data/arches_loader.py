@@ -203,7 +203,7 @@ class ArchesLoader(data.Dataset):
 
         label_np = np.ones((pc_np.shape[1]))
         if 'labels' in data.files:
-            label_np = data['labels']
+            label_np = np.squeeze(data['labels'])
             
         som_node_np = data['som_node'] # 3 x 64 (node_num)
 

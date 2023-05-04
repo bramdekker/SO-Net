@@ -76,8 +76,8 @@ class Model():
         self.seg = self.input_seg.detach()
 
         # self.seg needs to be onehot encoded? -> 4 == [0, 0, 0, 0, 1] etc?
-        # Remove one dimension.
-        self.seg = torch.squeeze(self.seg)
+        # # Remove one dimension.
+        # self.seg = torch.squeeze(self.seg)
 
         print(f"Number of nonzero elements is {torch.count_nonzero(self.seg)}")
         print(f"Shape of self.seg is {self.seg.shape}. First 2 entries of self.seg are {self.seg[:2]}.")
