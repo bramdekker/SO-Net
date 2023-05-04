@@ -16,16 +16,17 @@ import torch.optim as optim
 import random
 import numpy as np
 
+from torcheval.metrics import MulticlassConfusionMatrix
 from models import losses
 from models.segmenter import Model
 from data.arches_loader import ArchesLoader
 
 
-def cluster_dataset(model, save_dir):
+def cluster_dataset(model, save_dir, opt):
     dataset = ArchesLoader(opt.dataroot, 'all', opt)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
 
-    for data in dataloader:
+    for i, data in enumerate(dataloader):
         # Get prediction for this batch
         input_pc, input_sn, input_seg, input_node, input_node_knn_I = data #input_label, 
         model.set_input(input_pc, input_sn, input_seg, input_node, input_node_knn_I) #input_label, 
@@ -33,11 +34,24 @@ def cluster_dataset(model, save_dir):
         # Save all prediction per sample to separate file.
         model.test_model()
 
+        if i == 0:
+            print(f"Shape of model.score_segmenter.data is {model.score_segmenter.data}")
+
         # print(f"The shape of the data in model.score_segmenter is {model.score_segmenter.data.shape}") # BxCxN
         # print(f"The first batch entry the first index has length {model.score_segmenter.data[0][0].size()} and looks like {model.score_segmenter.data[0][0]}") 
         _, predicted_seg = torch.max(model.score_segmenter.data, dim=1, keepdim=False)
-        print(f"predicted seg shape is {predicted_seg.shape} should be BxNx1 or Bx1xN") # for every point a class
+        # print(f"predicted seg shape is {predicted_seg.shape} should be BxNx1 or Bx1xN") # for every point a class
         # print(f"The first two predictions are {predicted_seg[:2]}")
+
+        # TODO: Calculate mIoU
+        if i == 0:
+            print(f"Shape of predicted_seg is {predicted_seg.shape} and shape of input_seg is {input_seg.shape}")
+
+            metric = MulticlassConfusionMatrix(opt.classes)
+
+            metric.update(predicted_seg, input_seg)
+            print(metric.compute())
+
 
 
 
@@ -58,7 +72,7 @@ if __name__=='__main__':
     if opt.pretrain is not None:
         model.encoder.load_state_dict(torch.load(opt.pretrain))
 
-    cluster_dataset(model, opt.cluster_save_dir)
+    cluster_dataset(model, opt.cluster_save_dir, opt)
 
     # load pre-trained model
     # folder = 'checkpoints/'

@@ -142,8 +142,8 @@ class Model():
         self.segmenter.eval()
         self.forward(is_train=False)
 
-        print(f"Param inputs for softmax_segmenter has shape {self.score_segmenter.shape}")
-        print(f"Param targets for softmax_segmenter has shape {self.seg.shape}")
+        # print(f"Param inputs for softmax_segmenter has shape {self.score_segmenter.shape}")
+        # print(f"Param targets for softmax_segmenter has shape {self.seg.shape}")
 
         # self.loss_classifier = self.softmax_classifier(self.score_classifier, self.label)
 
