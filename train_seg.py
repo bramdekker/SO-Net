@@ -49,7 +49,7 @@ def cluster_dataset(model, save_dir, opt):
 
             metric = MulticlassConfusionMatrix(opt.classes)
 
-            metric.update(predicted_seg.squeeze(), input_seg.squeeze())
+            metric.update(predicted_seg.squeeze(), input_seg.cpu().squeeze())
             print(metric.compute())
 
 
