@@ -54,6 +54,7 @@ def get_iou(conf_matrix):
                 falses += conf_matrix.data[cl][j]
                 falses += conf_matrix.data[j][cl]
 
+        print(f"{tp / (tp + falses)} is appended to the ious list.")
         ious.append(tp / (tp + falses))
 
     print(ious)
