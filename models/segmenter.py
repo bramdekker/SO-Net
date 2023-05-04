@@ -79,8 +79,10 @@ class Model():
         # # Remove one dimension.
         # self.seg = torch.squeeze(self.seg)
 
-        print(f"Number of nonzero elements is {torch.count_nonzero(self.seg)}")
-        print(f"Shape of self.seg is {self.seg.shape}. First 2 entries of self.seg are {self.seg[:2]}.")
+        print(f"Number of nonzero elements is {torch.count_nonzero(self.seg.data)}")
+        print(f"Shape of self.seg is {self.seg.shape}. First 2 entries of self.seg are {self.seg.data[:2]}.")
+
+        assert(np.logical_and(np.all(self.seg.data >= 0), np.all(self.seg.data < self.opt.classes + 3)))
         # self.label = self.input_label.detach()
 
 
