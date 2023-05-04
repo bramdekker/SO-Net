@@ -65,14 +65,14 @@ class Model():
 
 
     def set_input(self, input_pc, input_sn, input_seg, input_node, input_node_knn_I): # input_label, 
-        assert(np.logical_and(np.all(input_seg.cpu().numpy() >= 0), np.all(input_seg.cpu().numpy() < self.opt.classes + 3)))
+        assert(np.logical_and(np.all(input_seg.cpu().numpy() >= 0), np.all(input_seg.cpu().numpy() < self.opt.classes)))
 
         self.input_pc.resize_(input_pc.size()).copy_(input_pc)
         self.input_sn.resize_(input_sn.size()).copy_(input_sn)
         # self.input_label.resize_(input_label.size()).copy_(input_label)
         self.input_seg.resize_(input_seg.size()).copy_(input_seg)
-        
-        assert(np.logical_and(np.all(self.input_seg.cpu().numpy() >= 0), np.all(self.input_seg.cpu().numpy() < self.opt.classes + 3)))
+
+        assert(np.logical_and(np.all(self.input_seg.cpu().numpy() >= 0), np.all(self.input_seg.cpu().numpy() < self.opt.classes)))
 
         self.input_node.resize_(input_node.size()).copy_(input_node)
         self.input_node_knn_I.resize_(input_node_knn_I.size()).copy_(input_node_knn_I)
@@ -88,7 +88,7 @@ class Model():
         print(f"The dtype of self.seg is {self.seg.dtype}")
         print(f"Shape of self.seg is {self.seg.shape}. First 2 entries of self.seg are {self.seg.data[:2]}.")
 
-        assert(np.logical_and(np.all(self.seg.data.cpu().numpy() >= 0), np.all(self.seg.data.cpu().numpy() < self.opt.classes + 3)))
+        assert(np.logical_and(np.all(self.seg.data.cpu().numpy() >= 0), np.all(self.seg.data.cpu().numpy() < self.opt.classes)))
         # self.label = self.input_label.detach()
 
 
