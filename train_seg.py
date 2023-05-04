@@ -35,7 +35,7 @@ def cluster_dataset(model, save_dir, opt):
         model.test_model()
 
         if i == 0:
-            print(f"Shape of model.score_segmenter.data is {model.score_segmenter.data}")
+            print(f"Shape of model.score_segmenter.data is {model.score_segmenter.data.shape}")
 
         # print(f"The shape of the data in model.score_segmenter is {model.score_segmenter.data.shape}") # BxCxN
         # print(f"The first batch entry the first index has length {model.score_segmenter.data[0][0].size()} and looks like {model.score_segmenter.data[0][0]}") 
@@ -49,7 +49,7 @@ def cluster_dataset(model, save_dir, opt):
 
             metric = MulticlassConfusionMatrix(opt.classes)
 
-            metric.update(predicted_seg, input_seg)
+            metric.update(predicted_seg.squeeze(), input_seg.squeeze())
             print(metric.compute())
 
 
