@@ -56,6 +56,8 @@ def get_iou(conf_matrix):
 
         ious.append(tp / (tp + falses))
 
+    print(ious)
+
     return avg(ious)
 
 def cluster_dataset(model, save_dir, opt):
