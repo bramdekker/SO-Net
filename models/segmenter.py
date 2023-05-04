@@ -75,12 +75,14 @@ class Model():
         self.sn = self.input_sn.detach()
         self.seg = self.input_seg.detach()
 
+        # self.seg needs to be onehot encoded? -> 4 == [0, 0, 0, 0, 1] etc?
+        # Remove one dimension.
+        self.seg = torch.squeeze(self.seg)
+
         print(f"Number of nonzero elements is {torch.count_nonzero(self.seg)}")
         print(f"Shape of self.seg is {self.seg.shape}. First 2 entries of self.seg are {self.seg[:2]}.")
         # self.label = self.input_label.detach()
 
-        # Remove one dimension.
-        self.seg = torch.squeeze(self.seg)
 
     def forward(self, is_train=False, epoch=None):
         # ------------------------------------------------------------------
@@ -131,6 +133,8 @@ class Model():
         self.encoder.eval()
         self.segmenter.eval()
         self.forward(is_train=False)
+
+        print(f"Output of the segmenter has shape {self.score_segmenter.shape}")
 
         # self.loss_classifier = self.softmax_classifier(self.score_classifier, self.label)
         self.loss_segmenter = self.softmax_segmenter(self.score_segmenter, self.seg)
