@@ -25,7 +25,7 @@ def cluster_dataset(model, save_dir):
     dataset = ArchesLoader(opt.dataroot, 'all', opt)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
 
-    for data in enumerate(dataloader):
+    for data in dataloader:
         # Get prediction for this batch
         input_pc, input_sn, input_seg, input_node, input_node_knn_I = data #input_label, 
         model.set_input(input_pc, input_sn, input_seg, input_node, input_node_knn_I) #input_label, 
