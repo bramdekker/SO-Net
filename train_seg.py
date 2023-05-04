@@ -80,14 +80,14 @@ def cluster_dataset(model, save_dir, opt):
         # print(f"The first two predictions are {predicted_seg[:2]}")
 
         # TODO: Calculate mIoU
-        if i == 0:
+        # if i == 0:
             # print(f"Shape of predicted_seg is {predicted_seg.shape} and shape of input_seg is {input_seg.shape}")
             # print(f"Predicted seg device is {predicted_seg.get_device()}, input_seg device is {input_seg.get_device()}")
-            metric = MulticlassConfusionMatrix(opt.classes)
+        metric = MulticlassConfusionMatrix(opt.classes)
 
-            metric.update(predicted_seg.cpu().squeeze(), input_seg.squeeze())
-            conf_matrix = metric.compute()
-            print(f"Overall accuracy is {get_overall_acc(conf_matrix)} and the mean IoU is {get_iou(conf_matrix)}")
+        metric.update(predicted_seg.cpu().squeeze(), input_seg.squeeze())
+        conf_matrix = metric.compute()
+        print(f"Overall accuracy is {get_overall_acc(conf_matrix)} and the mean IoU is {get_iou(conf_matrix)}")
 
 
 
