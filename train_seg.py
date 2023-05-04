@@ -33,9 +33,10 @@ def cluster_dataset(model, save_dir):
         # Save all prediction per sample to separate file.
         model.test_model()
 
-        print(f"The shape of the data in model.score_segmenter is {model.score_segmenter.data.shape}") # BxCxN
-        print(f"The first batch entry the first index has length {model.score_segmenter.data[0][0].size()} and looks like {model.score_segmenter.data[0][0]}") 
-        # _, predicted_seg = torch.max(model.score_segmenter.data, dim=2, keepdim=False) 
+        # print(f"The shape of the data in model.score_segmenter is {model.score_segmenter.data.shape}") # BxCxN
+        # print(f"The first batch entry the first index has length {model.score_segmenter.data[0][0].size()} and looks like {model.score_segmenter.data[0][0]}") 
+        _, predicted_seg = torch.max(model.score_segmenter.data, dim=1, keepdim=False)
+        print(f"predicted seg shape is {predicted_seg.shape} should be BxNx1 or Bx1xN") # for every point a class
         # print(f"The first two predictions are {predicted_seg[:2]}")
 
 
