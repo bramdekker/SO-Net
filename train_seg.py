@@ -149,7 +149,23 @@ def cluster_dataset(model, save_dir, opt):
     for class_num, mIoU in enumerate(ious):
         print(f"Class {class_num} had a mIoU of {mIoU}")
 
+def train_model(model, trainset, opt):
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
 
+    for e in range(opt.epochs):
+
+        for i, data in enumerate(trainloader):
+
+            input_pc, input_sn, input_label, input_seg, input_node, input_node_knn_I = data
+            model.set_input(input_pc, input_sn, input_label, input_seg, input_node, input_node_knn_I)
+
+            model.optimize()
+
+            errors = model.get_current_errors()
+            
+            print(model.test_loss_segmenter.item())
+            print(errors)
+            print()
 
 
 if __name__=='__main__':
@@ -168,6 +184,14 @@ if __name__=='__main__':
     model = Model(opt)
     if opt.pretrain is not None:
         model.encoder.load_state_dict(torch.load(opt.pretrain))
+
+    # TODO: Train on 10% labeled data.
+
+    dataset = ArchesLoader(opt.dataroot, 'all', opt)
+    training_size = round(opt.train_frac * len(dataset))
+    trainset = torch.utils.data.random_split(dataset, [training_size])
+
+    train_model(model, trainset, opt)
 
     cluster_dataset(model, opt.cluster_save_dir, opt)
 
