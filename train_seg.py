@@ -79,7 +79,7 @@ def save_to_las(input_pc, pred_labels, orig_labels, save_dir):
     # Save coordinates + predicted labels to las.
 
     # Save point cloud with predicted labels.
-    input_data = input_pc
+    input_data = input_pc.cpu().numpy()
     # 1. Create a new header
     header = laspy.LasHeader(point_format=6, version="1.4")
 
@@ -127,7 +127,7 @@ def cluster_dataset(model, save_dir, opt):
 
         metric.update(predicted_seg.cpu().squeeze(), input_seg.squeeze())
 
-        if i == 0:
+        if i == 10:
             save_to_las(input_pc, predicted_seg.cpu().squeeze(), input_seg.squeeze(), save_dir)
 
     # Get accuracy and mean IoU for all data.    
