@@ -24,6 +24,7 @@ class Options():
         self.parser.add_argument('--save_train_pcs', action="store_true", help="save first batch of last epoch of training as point clouds")
         self.parser.add_argument('--save_test_pcs', action="store_true", help="save first batch of last epoch of testing as point clouds")
 
+        self.parser.add_argument('--train_frac', type=float, default=0.1, help='initial fraction for training segmentation model')
         self.parser.add_argument('--epochs', type=int, default=5, help='number of training epochs')
         self.parser.add_argument('--batch_size', type=int, default=8, help='input batch size')
         self.parser.add_argument('--input_pc_num', type=int, default=1024, help='# of input points')
