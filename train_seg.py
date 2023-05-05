@@ -61,11 +61,13 @@ def get_iou(conf_matrix):
 
     print(ious)
 
-    return avg(ious)
+    return ious
 
 def cluster_dataset(model, save_dir, opt):
     dataset = ArchesLoader(opt.dataroot, 'all', opt)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
+
+    metric = MulticlassConfusionMatrix(opt.classes)
 
     for i, data in enumerate(dataloader):
         # Get prediction for this batch
@@ -88,11 +90,16 @@ def cluster_dataset(model, save_dir, opt):
         # if i == 0:
             # print(f"Shape of predicted_seg is {predicted_seg.shape} and shape of input_seg is {input_seg.shape}")
             # print(f"Predicted seg device is {predicted_seg.get_device()}, input_seg device is {input_seg.get_device()}")
-        metric = MulticlassConfusionMatrix(opt.classes)
 
         metric.update(predicted_seg.cpu().squeeze(), input_seg.squeeze())
-        conf_matrix = metric.compute()
-        print(f"Overall accuracy is {get_overall_acc(conf_matrix)} and the mean IoU is {get_iou(conf_matrix)}")
+
+    # Get accuracy and mean IoU for all data.    
+    conf_matrix = metric.compute()
+    ious = get_iou(conf_matrix)
+    print(f"Overall accuracy is {get_overall_acc(conf_matrix)} and the mean IoU is {avg(ious)}")
+    
+    for class_num, mIoU in enumerate(ious):
+        print(f"Class {class_num} had a mIoU of {mIoU}")
 
 
 
