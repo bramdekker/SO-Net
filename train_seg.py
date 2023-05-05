@@ -189,7 +189,7 @@ if __name__=='__main__':
 
     dataset = ArchesLoader(opt.dataroot, 'all', opt)
     training_size = round(opt.train_frac * len(dataset))
-    trainset = torch.utils.data.random_split(dataset, [training_size])
+    trainset, _ = torch.utils.data.random_split(dataset, [training_size, len(dataset) - training_size])
 
     train_model(model, trainset, opt)
 
