@@ -63,6 +63,37 @@ def get_iou(conf_matrix):
 
     return ious
 
+def save_to_las(input_pc, pred_labels, orig_labels, save_dir):
+    """Save the current batch of reconstructions to LAS files otogether with the original point clouds."""
+    # ([('pc_colored_predicted', [input_pc_np, pc_color_np]),
+    #   ('pc_colored_gt',        [input_pc_np, gt_pc_color_np])])
+
+    assert(pred_labels.shape == orig_labels.shape)
+    assert(pred_labels.get_device() == orig_labels.get_device())
+    
+    # This will transform the labels to rgb colors.
+    # input_pred_dict = model.get_current_visuals()
+    # input_pc, predicted_pc = input_pred_dict["pc_colored_predicted"], input_pred_dict["pc_colored_gt"]
+
+    # Save coordinates + predicted labels to las.
+
+    # Save point cloud with predicted labels.
+    input_data = input_pc
+    # 1. Create a new header
+    header = laspy.LasHeader(point_format=6, version="1.4")
+
+    # 2. Create a Las
+    las = laspy.LasData(header)
+
+    las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+    las.y = input_data[1]
+    las.z = input_data[2]
+    las.pred_label = pred_labels # Set labels of every point.
+    las.orig_label = orig_labels
+
+    las.write("%s_%s.las" % (save_dir, "segment_test1"))
+
+
 def cluster_dataset(model, save_dir, opt):
     dataset = ArchesLoader(opt.dataroot, 'all', opt)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
@@ -92,6 +123,9 @@ def cluster_dataset(model, save_dir, opt):
             # print(f"Predicted seg device is {predicted_seg.get_device()}, input_seg device is {input_seg.get_device()}")
 
         metric.update(predicted_seg.cpu().squeeze(), input_seg.squeeze())
+
+        if i == 0:
+            save_to_las(input_pc, predicted_seg.cpu().squeeze(), input_seg.squeeze() save_dir)
 
     # Get accuracy and mean IoU for all data.    
     conf_matrix = metric.compute()
