@@ -93,7 +93,7 @@ def save_to_las(input_pc, pred_labels, orig_labels, save_dir):
     las.pred_label = pred_labels.squeeze() # Set labels of every point.
     las.orig_label = orig_labels.squeeze()
 
-    las.write("%s_%s.las" % (save_dir, "segment_test1"))
+    las.write("%s/%s.las" % (save_dir, "segment_test1"))
 
 
 def cluster_dataset(model, save_dir, opt):
