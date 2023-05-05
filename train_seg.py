@@ -125,21 +125,23 @@ def cluster_dataset(model, save_dir, opt):
         if i == 0:
             print(f"Shape of model.score_segmenter.data is {model.score_segmenter.data.shape}")
 
+        for j in range(len(input_pc)):
         # print(f"The shape of the data in model.score_segmenter is {model.score_segmenter.data.shape}") # BxCxN
         # print(f"The first batch entry the first index has length {model.score_segmenter.data[0][0].size()} and looks like {model.score_segmenter.data[0][0]}") 
-        _, predicted_seg = torch.max(model.score_segmenter.data, dim=1, keepdim=False)
-        # print(f"predicted seg shape is {predicted_seg.shape} should be BxNx1 or Bx1xN") # for every point a class
-        # print(f"The first two predictions are {predicted_seg[:2]}")
+            _, predicted_seg = torch.max(model.score_segmenter.data, dim=1, keepdim=False)
+            # print(f"predicted seg shape is {predicted_seg.shape} should be BxNx1 or Bx1xN") # for every point a class
+            # print(f"The first two predictions are {predicted_seg[:2]}")
 
-        # TODO: Calculate mIoU
-        # if i == 0:
-            # print(f"Shape of predicted_seg is {predicted_seg.shape} and shape of input_seg is {input_seg.shape}")
-            # print(f"Predicted seg device is {predicted_seg.get_device()}, input_seg device is {input_seg.get_device()}")
+            # TODO: Calculate mIoU
+            # if i == 0:
+                # print(f"Shape of predicted_seg is {predicted_seg.shape} and shape of input_seg is {input_seg.shape}")
+                # print(f"Predicted seg device is {predicted_seg.get_device()}, input_seg device is {input_seg.get_device()}")
 
-        metric.update(predicted_seg.cpu().squeeze(), input_seg.squeeze())
+            metric.update(predicted_seg.cpu(), input_seg[j])
 
-        if np.any(predicted_seg.cpu().numpy() > 0):
-            save_to_las(input_pc.numpy(), predicted_seg.cpu().numpy(), input_seg.numpy(), save_dir, i)
+            # Save 100 samples.
+            if i < 100:
+                save_to_las(input_pc[j].numpy(), predicted_seg.cpu().numpy(), input_seg[j].numpy(), save_dir, i)
 
     # Get accuracy and mean IoU for all data.    
     conf_matrix = metric.compute()
