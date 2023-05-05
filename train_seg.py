@@ -68,6 +68,7 @@ def save_to_las(input_pc, pred_labels, orig_labels, save_dir):
     # ([('pc_colored_predicted', [input_pc_np, pc_color_np]),
     #   ('pc_colored_gt',        [input_pc_np, gt_pc_color_np])])
 
+    print(f"Shape of the predicted labels is {pred_labels.shape} (should be N).")
     assert(pred_labels.shape == orig_labels.shape)
     assert(pred_labels.get_device() == orig_labels.get_device())
     
@@ -125,7 +126,7 @@ def cluster_dataset(model, save_dir, opt):
         metric.update(predicted_seg.cpu().squeeze(), input_seg.squeeze())
 
         if i == 0:
-            save_to_las(input_pc, predicted_seg.cpu().squeeze(), input_seg.squeeze() save_dir)
+            save_to_las(input_pc, predicted_seg.cpu().squeeze(), input_seg.squeeze(), save_dir)
 
     # Get accuracy and mean IoU for all data.    
     conf_matrix = metric.compute()
