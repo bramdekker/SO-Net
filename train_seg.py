@@ -138,7 +138,7 @@ def cluster_dataset(model, save_dir, opt):
 
         metric.update(predicted_seg.cpu().squeeze(), input_seg.squeeze())
 
-        if np.logical_and(np.any(predicted_seg.cpu().numpy() > 0)):
+        if np.any(predicted_seg.cpu().numpy() > 0):
             save_to_las(input_pc.numpy(), predicted_seg.cpu().numpy(), input_seg.numpy(), save_dir, i)
 
     # Get accuracy and mean IoU for all data.    
