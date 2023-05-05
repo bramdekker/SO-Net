@@ -86,6 +86,8 @@ def save_to_las(input_pc, pred_labels, orig_labels, save_dir):
     # 2. Create a Las
     las = laspy.LasData(header)
 
+    print(f"Shape of input_data is {input_data.shape}")
+    print(f"First two elements of input_data are {input_data[:2]}.")
     las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
     las.y = input_data[1]
     las.z = input_data[2]
