@@ -70,7 +70,6 @@ def save_to_las(input_pc, pred_labels, orig_labels, save_dir):
 
     print(f"Shape of the predicted labels is {pred_labels.shape} (should be N).")
     assert(pred_labels.shape == orig_labels.shape)
-    assert(pred_labels.get_device() == orig_labels.get_device())
     
     # This will transform the labels to rgb colors.
     # input_pred_dict = model.get_current_visuals()
@@ -91,8 +90,8 @@ def save_to_las(input_pc, pred_labels, orig_labels, save_dir):
     las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
     las.y = input_data[1]
     las.z = input_data[2]
-    las.pred_label = pred_labels # Set labels of every point.
-    las.orig_label = orig_labels
+    las.pred_label = pred_labels.squeeze() # Set labels of every point.
+    las.orig_label = orig_labels.squeeze()
 
     las.write("%s_%s.las" % (save_dir, "segment_test1"))
 
