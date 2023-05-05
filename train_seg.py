@@ -156,8 +156,8 @@ def train_model(model, trainset, opt):
 
         for i, data in enumerate(trainloader):
 
-            input_pc, input_sn, input_label, input_seg, input_node, input_node_knn_I = data
-            model.set_input(input_pc, input_sn, input_label, input_seg, input_node, input_node_knn_I)
+            input_pc, input_sn, input_seg, input_node, input_node_knn_I = data
+            model.set_input(input_pc, input_sn, input_seg, input_node, input_node_knn_I)
 
             model.optimize()
 
