@@ -128,7 +128,7 @@ def cluster_dataset(model, save_dir, opt):
         for j in range(len(input_pc)):
         # print(f"The shape of the data in model.score_segmenter is {model.score_segmenter.data.shape}") # BxCxN
         # print(f"The first batch entry the first index has length {model.score_segmenter.data[0][0].size()} and looks like {model.score_segmenter.data[0][0]}") 
-            _, predicted_seg = torch.max(model.score_segmenter.data[j], dim=1, keepdim=False)
+            _, predicted_seg = torch.max(model.score_segmenter.data[j], dim=0, keepdim=False)
             # print(f"predicted seg shape is {predicted_seg.shape} should be BxNx1 or Bx1xN") # for every point a class
             # print(f"The first two predictions are {predicted_seg[:2]}")
 
