@@ -63,7 +63,7 @@ def get_iou(conf_matrix):
 
     return ious
 
-def save_to_las(input_pc, pred_labels, orig_labels, save_dir):
+def save_to_las(input_pc, pred_labels, orig_labels, save_dir, index):
     """Save the current batch of reconstructions to LAS files otogether with the original point clouds."""
     # ([('pc_colored_predicted', [input_pc_np, pc_color_np]),
     #   ('pc_colored_gt',        [input_pc_np, gt_pc_color_np])])
@@ -90,10 +90,22 @@ def save_to_las(input_pc, pred_labels, orig_labels, save_dir):
     las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
     las.y = input_data[1]
     las.z = input_data[2]
-    las.pred_label = pred_labels.squeeze() # Set labels of every point.
-    las.orig_label = orig_labels.squeeze()
+    las.classification = pred_labels.squeeze() # Set labels of every point.
 
-    las.write("%s/%s.las" % (save_dir, "segment_test1"))
+    las.write("%s/%s_%d.las" % (save_dir, "predicted", index))
+
+    # 2. Create a Las
+    las2 = laspy.LasData(header)
+
+    # print(f"Shape of input_data is {input_data.shape}")
+    # print(f"First two elements of input_data are {input_data[:2]}.")
+    las2.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
+    las2.y = input_data[1]
+    las2.z = input_data[2]
+    las2.classification = orig_labels.squeeze() # Set labels of every point.
+
+    las2.write("%s/%s_%d.las" % (save_dir, "original", index))
+
 
 
 def cluster_dataset(model, save_dir, opt):
@@ -126,8 +138,8 @@ def cluster_dataset(model, save_dir, opt):
 
         metric.update(predicted_seg.cpu().squeeze(), input_seg.squeeze())
 
-        if i == 10:
-            save_to_las(input_pc.numpy(), predicted_seg.cpu().numpy(), input_seg.numpy(), save_dir)
+        if np.logical_and(np.any(predicted_seg.cpu().numpy() > 0)):
+            save_to_las(input_pc.numpy(), predicted_seg.cpu().numpy(), input_seg.numpy(), save_dir, i)
 
     # Get accuracy and mean IoU for all data.    
     conf_matrix = metric.compute()
