@@ -146,10 +146,10 @@ def cluster_dataset(model, save_dir, opt):
     # Get accuracy and mean IoU for all data.    
     conf_matrix = metric.compute()
     ious = get_iou(conf_matrix)
-    print(f"Overall accuracy is {get_overall_acc(conf_matrix)} and the mean IoU is {avg(ious)}")
+    print(f"Overall accuracy is {get_overall_acc(conf_matrix * 100)} and the mean IoU is {avg(ious) * 100}")
     
     for class_num, mIoU in enumerate(ious):
-        print(f"Class {class_num} had a mIoU of {mIoU}")
+        print(f"Class {class_num} had a mIoU of {mIoU * 100}")
 
 def train_model(model, trainset, opt):
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
