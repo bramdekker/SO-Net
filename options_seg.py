@@ -13,7 +13,7 @@ class Options():
 
         self.parser.add_argument('--dataset', type=str, default='catenary_arches', help='modelnet / shrec / shapenet')
         self.parser.add_argument('--dataroot', default='/ssd/dataset/shapenetcore_partanno_segmentation_benchmark_v0_normal/', help='path to images & laser point clouds')
-        self.parser.add_argument('--classes', type=int, default=17, help='ModelNet40 or ModelNet10') # actually 14 but range is from 0-16 with 11-13 not present
+        self.parser.add_argument('--classes', type=int, default=14, help='ModelNet40 or ModelNet10') # actually 14 but range is from 0-16 with 11-13 not present
         self.parser.add_argument('--name', type=str, default='train_boxes_3_3_3', help='name of the experiment. It decides where to store samples and models')
         self.parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints', help='models are saved here')
         self.parser.add_argument('--cluster_save_dir', type=str, default='./test_clustering', help='cluster results are saved here')

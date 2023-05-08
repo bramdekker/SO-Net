@@ -110,7 +110,7 @@ def save_to_las(input_pc, pred_labels, orig_labels, save_dir, index):
 
 def cluster_dataset(model, save_dir, opt):
     dataset = ArchesLoader(opt.dataroot, 'all', opt)
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=opt.nThreads)
 
     metric = MulticlassConfusionMatrix(opt.classes)
 
@@ -132,7 +132,6 @@ def cluster_dataset(model, save_dir, opt):
             # print(f"predicted seg shape is {predicted_seg.shape} should be BxNx1 or Bx1xN") # for every point a class
             # print(f"The first two predictions are {predicted_seg[:2]}")
 
-            # TODO: Calculate mIoU
             # if i == 0:
                 # print(f"Shape of predicted_seg is {predicted_seg.shape} and shape of input_seg is {input_seg.shape}")
                 # print(f"Predicted seg device is {predicted_seg.get_device()}, input_seg device is {input_seg.get_device()}")
@@ -151,6 +150,8 @@ def cluster_dataset(model, save_dir, opt):
     for class_num, mIoU in enumerate(ious):
         print(f"Class {class_num} had a mIoU of {mIoU * 100}")
 
+# TODO: set labels 11 and 13 to 0 and then use only labels 0 to 13 (e.g. translate labels 14, 15, 16 to 11, 12 and 13 resp.)
+# This will increase performance of model quite a bit probably.
 def train_model(model, trainset, opt):
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
 
