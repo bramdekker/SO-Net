@@ -68,7 +68,7 @@ def save_to_las(input_pc, pred_labels, orig_labels, save_dir, index):
     # ([('pc_colored_predicted', [input_pc_np, pc_color_np]),
     #   ('pc_colored_gt',        [input_pc_np, gt_pc_color_np])])
 
-    print(f"Shape of the predicted labels is {pred_labels.shape} (should be N).")
+    # print(f"Shape of the predicted labels is {pred_labels.shape} (should be N).")
     assert(pred_labels.shape == orig_labels.shape)
     
     # This will transform the labels to rgb colors.
@@ -85,8 +85,8 @@ def save_to_las(input_pc, pred_labels, orig_labels, save_dir, index):
     # 2. Create a Las
     las = laspy.LasData(header)
 
-    print(f"Shape of input_data is {input_data.shape}")
-    print(f"First two elements of input_data are {input_data[:2]}.")
+    # print(f"Shape of input_data is {input_data.shape}")
+    # print(f"First two elements of input_data are {input_data[:2]}.")
     las.x = input_data[0] # Array with all x coefficients. [x1, x2, ..., xn]
     las.y = input_data[1]
     las.z = input_data[2]
@@ -129,7 +129,7 @@ def cluster_dataset(model, save_dir, opt):
         # print(f"The shape of the data in model.score_segmenter is {model.score_segmenter.data.shape}") # BxCxN
         # print(f"The first batch entry the first index has length {model.score_segmenter.data[0][0].size()} and looks like {model.score_segmenter.data[0][0]}") 
             _, predicted_seg = torch.max(model.score_segmenter.data[j], dim=0, keepdim=False)
-            print(f"predicted seg shape is {predicted_seg.shape} should be BxNx1 or Bx1xN") # for every point a class
+            # print(f"predicted seg shape is {predicted_seg.shape} should be BxNx1 or Bx1xN") # for every point a class
             # print(f"The first two predictions are {predicted_seg[:2]}")
 
             # TODO: Calculate mIoU
@@ -165,9 +165,9 @@ def train_model(model, trainset, opt):
 
             errors = model.get_current_errors()
             
-            print(model.test_loss_segmenter.item())
-            print(errors)
-            print()
+            # print(model.test_loss_segmenter.item())
+            # print(errors)
+            # print()
 
 
 if __name__=='__main__':
@@ -188,7 +188,6 @@ if __name__=='__main__':
         model.encoder.load_state_dict(torch.load(opt.pretrain))
 
     # TODO: Train on 10% labeled data.
-
     dataset = ArchesLoader(opt.dataroot, 'all', opt)
     training_size = round(opt.train_frac * len(dataset))
     trainset, _ = torch.utils.data.random_split(dataset, [training_size, len(dataset) - training_size])
