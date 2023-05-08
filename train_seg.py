@@ -169,6 +169,9 @@ def train_model(model, trainset, opt):
             # print(errors)
             # print()
 
+    cluster_dataset(model, opt.cluster_save_dir, opt)
+
+
 
 if __name__=='__main__':
     # trainset = ArchesLoader(opt.dataroot, 'train', opt)
@@ -193,8 +196,6 @@ if __name__=='__main__':
     trainset, _ = torch.utils.data.random_split(dataset, [training_size, len(dataset) - training_size])
 
     train_model(model, trainset, opt)
-
-    cluster_dataset(model, opt.cluster_save_dir, opt)
 
     # load pre-trained model
     # folder = 'checkpoints/'
