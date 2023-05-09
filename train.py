@@ -326,8 +326,8 @@ def main():
             if test_loss_round < best_test_loss:
                 best_test_loss = test_loss_round
                 print("Saving network...")
-                ae_model.save_network(ae_model.encoder, 'encoder', 'boxes_3_3_3_%depochs' % opt.epochs, opt.gpu_id)
-                ae_model.save_network(ae_model.decoder, 'decoder', 'boxes_3_3_3_%depochs' % opt.epochs, opt.gpu_id)
+                ae_model.save_network(ae_model.encoder, 'encoder', 'boxes_3_3_3_labeled_%depochs' % opt.epochs, opt.gpu_id)
+                ae_model.save_network(ae_model.decoder, 'decoder', 'boxes_3_3_3_labeled_%depochs' % opt.epochs, opt.gpu_id)
 
 
 
