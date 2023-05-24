@@ -26,7 +26,7 @@ def random_noise(data, min, max):
     return data + noise
 
 
-def random_gaussian_noise(data, mean, std):
+def random_gaussian_noise(data, mean, std, truncate_val):
     """ Add random Gaussian noise to each point in the point cloud to augument the dataset
         Input:
           Nx3 array, original point clouds + mean and std of noise
@@ -35,7 +35,7 @@ def random_gaussian_noise(data, mean, std):
     """
     # noise = np.random.normal(mean, std, len(data))
     # randn returns floating-point samples from the Gaussian distribution.
-    noise = np.clip(std * np.random.randn(data.shape[0], data.shape[1]) + mean, -0.05, 0.05)
+    noise = np.clip(std * np.random.randn(data.shape[0], data.shape[1]) + mean, -truncate_val, truncate_val)
     return data + noise
 
 def random_rotate_point_cloud(data, min_angle, max_angle):

@@ -312,7 +312,7 @@ def main():
         train_losses_round = []
         test_losses_round = []
 
-        best_test_loss = 0.5
+        best_test_loss = 0.4
 
         for i in range(opt.epochs):
             # Train models and record training losses

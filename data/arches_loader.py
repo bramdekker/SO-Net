@@ -7,6 +7,7 @@ import os.path
 import numpy as np
 import struct
 import math
+import laspy
 
 import torch
 import torchvision
@@ -45,7 +46,7 @@ def make_dataset_shapenet_normal(root, mode):
 
 
 # Hardcode the files for ease.
-def make_dataset_arches(root, mode, test_file):
+def make_dataset_arches(root, mode, test_file, min_points):
     file_name_list = []
 
     if mode == 'loocv':
@@ -55,7 +56,8 @@ def make_dataset_arches(root, mode, test_file):
     elif mode == 'loocv_test':
         return [test_file]
     elif mode == 'all':
-        return [f for f in os.listdir(root) if (f.endswith(".las") or f.endswith(".laz") or f.endswith(".pcd"))]
+        return [f for f in os.listdir(root) if (f.endswith(".las") or f.endswith(".laz")) and laspy.read(os.path.join(root, f)).header.point_count >= min_points]
+        # return [f for f in os.listdir(root) if (f.endswith(".las") or f.endswith(".laz") or f.endswith(".pcd"))]
     elif mode == 'train':
         # file_name_list = ["01_01.laz", "01_02.laz", "01_03.laz", "02_01.laz", "02_02.laz", "02_03.laz", "02_04.laz", "03_01.laz", "03_02.laz", "03_03.laz", "03_04.laz"]
         # file_name_list = ["01_01_norm.laz", "01_02_norm.laz", "01_03_norm.laz", "02_01_norm.laz", "02_02_norm.laz", "02_03_norm.laz", "02_04_norm.laz", "03_01_norm.laz", "03_02_norm.laz", "03_03_norm.laz", "03_04_norm.laz"]
@@ -143,7 +145,14 @@ class ArchesLoader(data.Dataset):
         self.rows = round(math.sqrt(self.node_num))
         self.cols = self.rows
 
-        self.noise_value = 0.000001
+        # Sample n ( = input_pc_num) points from the data
+        # Gaussian noise to coordinates + normals (mean=0, std=2cm/0.01) 
+        # A bit bigger gaussian noise to SOM nodes (mean=0, std=8cm/0.04)
+        # Scaling factor for cooridnates, normals, SOM nodes
+        # Random translation + rotation?
+        self.noise_std = 0.013 # box_size = 3 -> 1 = 1.5m -> 1cm (0.01m) = 0.0067
+        self.noise_mean = 0
+        self.noise_truncate_val = 0.033
         self.rotations = [-30, 0, 30]
 
         # Add random noise: what value to base it on? Normalized data, biggest max-min difference?
@@ -151,7 +160,7 @@ class ArchesLoader(data.Dataset):
         # Normalize? Need max and min of x, y and z
 
         # self.dataset = make_dataset_shapenet_normal(self.root, self.mode) # list of file names
-        self.dataset = make_dataset_arches(self.root, self.mode, self.test_file) # list of file names
+        self.dataset = make_dataset_arches(self.root, self.mode, self.test_file, self.opt.box_min_points) # list of file names
         # ensure there is no batch-1 batch
         # if len(self.dataset) % self.opt.batch_size == 1:
         #     self.dataset.pop()
@@ -170,7 +179,7 @@ class ArchesLoader(data.Dataset):
 
     # Add augmentation entries here as well. 
     def __len__(self):
-        return 2 * len(self.rotations) * len(self.dataset)
+        return len(self.dataset)
 
     def __getitem__(self, index):
         # pointnet++ dataset
@@ -182,7 +191,9 @@ class ArchesLoader(data.Dataset):
         # if self.mode == "test":
             # print(f"Length of dataset is (24): {len(self.dataset)}")
             # print(f"Dataset index is (0-3): {dataset_idx}")
-        file = self.dataset[dataset_idx][0:-4]
+        file = self.dataset[index][0:-4]
+        
+        # print(f"Now accessing file {file}")
         # print(f"With dataset idx {dataset_idx} and index {index}, the file to fetch is {file}.")
         file_ext = ".npz"
         # if self.opt.surface_normal:
@@ -203,7 +214,9 @@ class ArchesLoader(data.Dataset):
 
         label_np = np.ones((pc_np.shape[1]))
         if 'labels' in data.files:
-            label_np = np.squeeze(data['labels'])
+            label_np = data['labels']
+            
+        # print(f"Shape of label_np array is {label_np.shape}")
 
         assert(np.logical_and(np.all(label_np >= 0), np.all(label_np < self.opt.classes)))
 
@@ -248,12 +261,12 @@ class ArchesLoader(data.Dataset):
         # augmentation
         if self.mode == 'train':
             # index 1-6: 1-3 without noise, 4-6 with noise
-            if augmentation_idx >= 3:
+            # if augmentation_idx >= 3:
                 # print("Adding random noise")
-                pc_np = random_noise(pc_np, -self.noise_value, self.noise_value)
-                if self.opt.surface_normal:
-                    sn_np = random_noise(sn_np, -self.noise_value, self.noise_value)
-                som_node_np = random_noise(som_node_np, -self.noise_value, self.noise_value)
+            pc_np = random_gaussian_noise(pc_np, self.noise_mean, self.noise_std, self.noise_truncate_val)
+            if self.opt.surface_normal:
+                sn_np = random_noise(sn_np, self.noise_mean, self.noise_std, self.noise_truncate_val)
+            som_node_np = random_noise(som_node_np, self.noise_mean, self.noise_std * 4, self.noise_truncate_val * 4)
                 # print("After adding random noise")
                 # print(f"pc_np.shape: {pc_np.shape}")
             
@@ -263,13 +276,13 @@ class ArchesLoader(data.Dataset):
             # 0, 3 = -30
             # 1, 4 = 0
             # 2, 5 = 30
-            rotation_angle = self.rotations[augmentation_idx % len(self.rotations)]
-            if rotation_angle != 0:
-                # print("Rotating point cloud")
-                pc_np = rotate_point_cloud(pc_np, rotation_angle)
-                if self.opt.surface_normal:
-                    sn_np = rotate_point_cloud(sn_np, rotation_angle)
-                som_node_np = rotate_point_cloud(som_node_np, rotation_angle)
+            # rotation_angle = self.rotations[augmentation_idx % len(self.rotations)]
+            # if rotation_angle != 0:
+            #     # print("Rotating point cloud")
+            #     pc_np = rotate_point_cloud(pc_np, rotation_angle)
+            #     if self.opt.surface_normal:
+            #         sn_np = rotate_point_cloud(sn_np, rotation_angle)
+            #     som_node_np = rotate_point_cloud(som_node_np, rotation_angle)
                 # print("After rotating point cloud")
 
             # print(f"Shape after rotation is {som_node_np.shape}")
@@ -288,8 +301,8 @@ class ArchesLoader(data.Dataset):
             # som_node_np = jitter_point_cloud(som_node_np, sigma=0.04, clip=0.1)
 
             # print("Scaling point cloud")
-            # random scale
-            scale = np.random.uniform(low=0.9, high=1.1)
+            # Random scale
+            scale = np.random.uniform(low=0.8, high=1.2)
             pc_np = pc_np * scale
             if self.opt.surface_normal:
                 sn_np = sn_np * scale

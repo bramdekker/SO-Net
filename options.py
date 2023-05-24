@@ -17,6 +17,7 @@ class Options():
         self.parser.add_argument('--classes', type=int, default=14, help='ModelNet40 or ModelNet10')
         self.parser.add_argument('--name', type=str, default='train', help='name of the experiment. It decides where to store samples and models')
         self.parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints_catenary', help='models are saved here')
+        self.parser.add_argument('--box_min_points', type=int, default=3072, help='Boxes with smaller number of points are skipped')
 
         self.parser.add_argument('--avg_rounds', type=int, default=10, help="number of averaging rounds for the experiment")
         self.parser.add_argument('--train_fraction', type=float, default=0.8, help="fraction of dataset used for training")
