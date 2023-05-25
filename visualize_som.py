@@ -15,8 +15,8 @@ def visualize_som(file):
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
 
-    ax.scatter(som_node_np, c='r')
-    ax.scatter(pc_np, c='b')
+    ax.scatter(som_node_np[0], som_node_np[1], som_node_np[2], c='r')
+    ax.scatter(pc_np[0], pc_np[1], pc_np[2], c='b')
 
     plt.show()
 
