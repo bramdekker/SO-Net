@@ -196,7 +196,7 @@ def train_loocv(opt):
 
 def train_model(model, dataset, epoch, opt):
     """Train the model on the given dataset and using parameters defined in the Option object opt."""
-    trainloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
+    trainloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads, drop_last=True)
 
     begin_epoch = time.time()
 
