@@ -13,19 +13,20 @@ class Options():
 
         self.parser.add_argument('--dataset', type=str, default='catenary_arches', help='modelnet / shrec / shapenet')
         self.parser.add_argument('--dataroot', default='/ssd/dataset/shapenetcore_partanno_segmentation_benchmark_v0_normal/', help='path to images & laser point clouds')
+        self.parser.add_argument('--box_min_points', type=int, default=512, help='Minimum number of points in a box to include it')
         self.parser.add_argument('--classes', type=int, default=14, help='ModelNet40 or ModelNet10') # actually 14 but range is from 0-16 with 11-13 not present
-        self.parser.add_argument('--name', type=str, default='train_boxes_3_3_3', help='name of the experiment. It decides where to store samples and models')
+        self.parser.add_argument('--name', type=str, default='supervised_train_boxes_3_3_3', help='name of the experiment. It decides where to store samples and models')
         self.parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints', help='models are saved here')
         self.parser.add_argument('--cluster_save_dir', type=str, default='./test_clustering', help='cluster results are saved here')
         
 
-        self.parser.add_argument('--avg_rounds', type=int, default=10, help="number of averaging rounds for the experiment")
+        self.parser.add_argument('--avg_rounds', type=int, default=3, help="number of averaging rounds for the experiment")
         self.parser.add_argument('--train_fraction', type=float, default=0.8, help="fraction of dataset used for training")
         self.parser.add_argument('--save_train_pcs', action="store_true", help="save first batch of last epoch of training as point clouds")
         self.parser.add_argument('--save_test_pcs', action="store_true", help="save first batch of last epoch of testing as point clouds")
 
-        self.parser.add_argument('--train_frac', type=float, default=0.1, help='initial fraction for training segmentation model')
-        self.parser.add_argument('--epochs', type=int, default=5, help='number of training epochs')
+        self.parser.add_argument('--train_frac', type=float, default=0.8, help='initial fraction for training segmentation model')
+        self.parser.add_argument('--epochs', type=int, default=100, help='number of training epochs')
         self.parser.add_argument('--batch_size', type=int, default=8, help='input batch size')
         self.parser.add_argument('--input_pc_num', type=int, default=1024, help='# of input points')
         self.parser.add_argument('--surface_normal', type=bool, default=True, help='use surface normal in the pc input')
@@ -34,7 +35,7 @@ class Options():
         self.parser.add_argument('--display_winsize', type=int, default=256, help='display window size')
         self.parser.add_argument('--display_id', type=int, default=200, help='window id of the web display')
 
-        self.parser.add_argument('--feature_num', type=int, default=1024, help='length of encoded feature')
+        self.parser.add_argument('--feature_num', type=int, default=256, help='length of encoded feature')
         self.parser.add_argument('--activation', type=str, default='relu', help='activation function: relu, elu')
         self.parser.add_argument('--normalization', type=str, default='batch', help='normalization function: batch, instance')
 

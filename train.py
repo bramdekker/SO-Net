@@ -298,8 +298,8 @@ def main():
     dataset = ArchesLoader(opt.dataroot, 'all', opt)
 
     training_size = round(train_frac * len(dataset))
-    test_size = round(test_frac * len(dataset))
-
+    test_size = len(dataset) - training_size
+    
     # For every experiment, record lowest loss, all test losses and train losses. Losses are averages per epoch.
     # Lowest loss shape = (opt.avg_rounds) -> Avg lowest loss
     # Test/train losses shape = (opt.avg_rounds, epochs) -> Avg plots for train and test
@@ -312,7 +312,7 @@ def main():
         train_losses_round = []
         test_losses_round = []
 
-        best_test_loss = 0.4
+        best_test_loss = 0.7
 
         for i in range(opt.epochs):
             # Train models and record training losses
@@ -326,8 +326,8 @@ def main():
             if test_loss_round < best_test_loss:
                 best_test_loss = test_loss_round
                 print("Saving network...")
-                ae_model.save_network(ae_model.encoder, 'encoder', 'boxes_3_3_3_labeled_%depochs' % opt.epochs, opt.gpu_id)
-                ae_model.save_network(ae_model.decoder, 'decoder', 'boxes_3_3_3_labeled_%depochs' % opt.epochs, opt.gpu_id)
+                ae_model.save_network(ae_model.encoder, 'encoder', 'boxes_5_5_5_labeled_%depochs' % opt.epochs, opt.gpu_id)
+                ae_model.save_network(ae_model.decoder, 'decoder', 'boxes_5_5_5_labeled_%depochs' % opt.epochs, opt.gpu_id)
 
 
 

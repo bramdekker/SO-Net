@@ -267,7 +267,7 @@ class Segmenter(nn.Module):
                 feature_max_first_pn_out,
                 feature_max_knn_feature_1,
                 feature_max_final_pn_out,
-                feature):
+                feature, is_train):
         '''
         :param x_decentered: Bx3xkN
         :param x: Bx3xN
@@ -344,8 +344,15 @@ class Segmenter(nn.Module):
         layer4_out = self.layer4(layer3_avg_out)
         if self.opt.dropout > 0.1:
             layer4_out = self.drop4(layer4_out)
+            
+            
+        # TODO: use layer4_out as features for the points. Shape is B x 128 x 1024.
+        # print(f"Shape of layer4out is {layer4_out.shape}")   
+        if not is_train:
+            self.final_point_features = layer4_out
+             
         layer5_out = self.layer5(layer4_out)  # Bx50xN
-
+        # print(f"Shape of layer5out is {layer5_out.shape}")   
 
         return layer5_out
 

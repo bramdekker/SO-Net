@@ -15,6 +15,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import random
 import numpy as np
+import matplotlib.pyplot as plt
 
 from torcheval.metrics import MulticlassConfusionMatrix
 from models import losses
@@ -24,6 +25,18 @@ from data.arches_loader import ArchesLoader
 
 def avg(l):
     return sum(l) / len(l)
+
+def plot_train_test_loss(epochs, train_loss, test_loss):
+    """Plot the average train and testloss per epoch on a line plot."""
+    # Actually starts at 1.
+    x = range(epochs)
+
+    # plot lines
+    plt.plot(x, train_loss, label = "train loss")
+    plt.plot(x, test_loss, label = "test loss")
+    plt.legend()
+    plt.savefig(f'so_baseline_{epochs}epochs')
+    plt.show()
 
 def get_overall_acc(conf_matrix):
     total = 0
@@ -108,9 +121,9 @@ def save_to_las(input_pc, pred_labels, orig_labels, save_dir, index):
 
 
 
-def cluster_dataset(model, save_dir, opt):
-    dataset = ArchesLoader(opt.dataroot, 'all', opt)
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=opt.nThreads)
+def test_model(model, validationset, save_dir, opt):
+    # dataset = ArchesLoader(opt.dataroot, 'all', opt)
+    dataloader = torch.utils.data.DataLoader(validationset, batch_size=1, shuffle=False, num_workers=opt.nThreads)
 
     metric = MulticlassConfusionMatrix(opt.classes)
 
@@ -152,26 +165,56 @@ def cluster_dataset(model, save_dir, opt):
 
 # TODO: set labels 11 and 13 to 0 and then use only labels 0 to 13 (e.g. translate labels 14, 15, 16 to 11, 12 and 13 resp.)
 # This will increase performance of model quite a bit probably.
-def train_model(model, trainset, opt):
+def train_model(model, trainset, validationset, opt):
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.nThreads)
+    testloader = torch.utils.data.DataLoader(validationset, batch_size=opt.batch_size, shuffle=False, num_workers=opt.nThreads)
 
+    train_losses_round = [] # for every epoch the train loss
+    test_losses_round = [] # for every epoch the test loss
+    
     for e in range(opt.epochs):
+        
+        train_loss = 0
+        test_loss = 0
+        batch_amount = 0
+        t_batch_amount = 0
 
         for i, data in enumerate(trainloader):
-
             input_pc, input_sn, input_seg, input_node, input_node_knn_I = data
             model.set_input(input_pc, input_sn, input_seg, input_node, input_node_knn_I)
+        
+            batch_amount += input_seg.size()[0]
 
             model.optimize()
 
-            errors = model.get_current_errors()
-            
+            train_loss += model.loss_segmenter.cpu().data * input_seg.size()[0]            
             # print(model.test_loss_segmenter.item())
             # print(errors)
             # print()
+            
+        train_loss /= batch_amount
+        
+        train_losses_round.append(train_loss.item())
+        
+        
+        for j, t_data in enumerate(testloader):
+            t_input_pc, t_input_sn, t_input_seg, t_input_node, t_input_node_knn_I = t_data
+            model.set_input(t_input_pc, t_input_sn, t_input_seg, t_input_node, t_input_node_knn_I)
+        
+            t_batch_amount += t_input_seg.size()[0]
+            
+            model.test_model()
 
-    cluster_dataset(model, opt.cluster_save_dir, opt)
-
+            test_loss += model.loss_segmenter.cpu().data * t_input_seg.size()[0]            
+            # print(model.test_loss_segmenter.item())
+            # print(errors)
+            # print()
+            
+        test_loss /= t_batch_amount
+        
+        test_losses_round.append(test_loss.item())
+        
+    return train_losses_round, test_losses_round       
 
 
 if __name__=='__main__':
@@ -187,17 +230,42 @@ if __name__=='__main__':
     # visualizer = Visualizer(opt)
 
     # create model, optionally load pre-trained model
-    model = Model(opt)
-    if opt.pretrain is not None:
-        model.encoder.load_state_dict(torch.load(opt.pretrain))
 
     # TODO: Train on 10% labeled data.
     dataset = ArchesLoader(opt.dataroot, 'all', opt)
     training_size = round(opt.train_frac * len(dataset))
-    trainset, _ = torch.utils.data.random_split(dataset, [training_size, len(dataset) - training_size])
+    
+    train_losses = []
+    test_losses = []
+    
+    for _ in range(opt.avg_rounds):        
+        model = Model(opt)
+        if opt.pretrain is not None:
+            model.encoder.load_state_dict(torch.load(opt.pretrain))
+            
+        trainset, validationset = torch.utils.data.random_split(dataset, [training_size, len(dataset) - training_size])
 
-    train_model(model, trainset, opt)
+        train_loss_round, test_loss_round = train_model(model, trainset, validationset, opt)
+        train_losses.append(train_loss_round)        
+        test_losses.append(test_loss_round)
+        
+        test_model(model, validationset, opt.cluster_save_dir, opt)
+        
+        # if test_loss_round < best_test_loss:
+        #     best_test_loss = test_loss_round
+        #     print("Saving network...")
+        #     ae_model.save_network(ae_model.encoder, 'encoder', 'boxes_5_5_5_labeled_%depochs' % opt.epochs, opt.gpu_id)
+        #     ae_model.save_network(ae_model.decoder, 'decoder', 'boxes_5_5_5_labeled_%depochs' % opt.epochs, opt.gpu_id)
 
+        # Add recorded train and test losses to arrays.
+        # train_losses.append(train_losses_round)
+        # test_losses.append(test_losses_round)
+            
+    avg_train_losses = np.average(np.array(train_losses), axis=0) # should be 25 x 1
+    avg_test_losses = np.average(np.array(test_losses), axis=0)
+    
+    plot_train_test_loss(opt.epochs, avg_train_losses, avg_test_losses)
+    
     # load pre-trained model
     # folder = 'checkpoints/'
     # model_epoch = '2'

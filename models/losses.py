@@ -28,7 +28,7 @@ def robust_norm(var):
 
 
 class CrossEntropyLossSeg(nn.Module):
-    def __init__(self, weight=None, size_average=True):
+    def __init__(self, weight=None, size_average=None):
         super(CrossEntropyLossSeg, self).__init__()
         self.nll_loss = nn.NLLLoss(weight, size_average)
 
@@ -38,8 +38,14 @@ class CrossEntropyLossSeg(nn.Module):
         :param targets: BxN
         :return:
         '''
+        # print(f"Shape of inputs before unqueeze is {inputs.shape}")
+        # print(f"Shape of targets before unsqueeze is {targets.shape}")
+        
         inputs = inputs.unsqueeze(3)
         targets = targets.unsqueeze(2)
+        
+        # print(f"Shape of inputs after unqueeze is {inputs.shape}")
+        # print(f"Shape of targets after unsqueeze is {targets.shape}")
         return self.nll_loss(F.log_softmax(inputs, dim=1), targets)
 
 

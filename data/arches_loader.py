@@ -161,6 +161,13 @@ class ArchesLoader(data.Dataset):
 
         # self.dataset = make_dataset_shapenet_normal(self.root, self.mode) # list of file names
         self.dataset = make_dataset_arches(self.root, self.mode, self.test_file, self.opt.box_min_points) # list of file names
+        
+        # Use indices from this array as supervoxel labels -> no string tensor allowed.
+        self.all_supervoxels = self.get_all_supervoxels()
+        
+        print(f"Length of the all_supervoxels array is {len(self.all_supervoxels)}. First 3 entries are {self.all_supervoxels[:3]}")
+        
+        self.labelled_supervoxels = []
         # ensure there is no batch-1 batch
         # if len(self.dataset) % self.opt.batch_size == 1:
         #     self.dataset.pop()
@@ -176,16 +183,32 @@ class ArchesLoader(data.Dataset):
 
         # farthest point sample
         self.fathest_sampler = FarthestSampler()
+        
+    def get_all_supervoxels(self):
+        all_supervoxel_labels = []
+        
+        for i in range(len(self.dataset)):
+            file = self.dataset[i][0:-4]
+            file_ext = ".npz"
+            data = np.load(os.path.join(self.root, '%dx%d' % (self.rows, self.cols), file + file_ext))
+            
+            if 's_labels' in data.files:
+                s_labels_np = data['s_labels']
+                all_supervoxel_labels.extend(np.unique(s_labels_np))
+            
+        return all_supervoxel_labels
+        
+    def add_labelled_supervoxel(self, s_label):
+        self.labelled_supervoxel.append(s_label)
 
-    # Add augmentation entries here as well. 
+    # Add augmentation entries here as well.
     def __len__(self):
         return len(self.dataset)
 
-    def __getitem__(self, index):
-        # pointnet++ dataset
+    def __getitem__(self, index): # Item = 3x3x3 box
         # Get SOM file
-        dataset_idx = index // 6 # 0-len(self.dataset)
-        augmentation_idx = index % 6 # 0-5 
+        # dataset_idx = index // 6 # 0-len(self.dataset)
+        # augmentation_idx = index % 6 # 0-5 
 
 
         # if self.mode == "test":
@@ -207,6 +230,10 @@ class ArchesLoader(data.Dataset):
         # Data is like [[x1, x2, ..., xn], [y1, y2, ..., yn], [z1, z2, ..., zn]], so a 3xN array
         pc_np = data['pc']
         sn_np = np.ones_like(pc_np)
+        
+        s_labels_np = np.ones((pc_np.shape[1]))
+        if 's_labels' in data.files:
+            s_labels_np = data['s_labels']
         # print(f"Type of sn_np is {type(sn_np)}")
 
         if self.opt.surface_normal and 'sn' in data.files:
@@ -215,6 +242,11 @@ class ArchesLoader(data.Dataset):
         label_np = np.ones((pc_np.shape[1]))
         if 'labels' in data.files:
             label_np = data['labels']
+            
+        # # Box center coordinates
+        # center_np = np.zeros(3)
+        # if 'center' in data.files:
+        #     center_np = data['center']
             
         # print(f"Shape of label_np array is {label_np.shape}")
 
@@ -235,6 +267,9 @@ class ArchesLoader(data.Dataset):
 
         # print("Just before downsampling")
         # Downsample to the number of input points specified in options. Also sn when not used!
+        
+        # TODO: use pseudo random --> set a random seed
+        np.random.seed(42)
         if self.opt.input_pc_num < pc_np.shape[1]:
             # print(f"pc_np.shape: {pc_np.shape}")
             chosen_idx = np.random.choice(pc_np.shape[1], self.opt.input_pc_num, replace=False)
@@ -242,6 +277,7 @@ class ArchesLoader(data.Dataset):
             pc_np = pc_np[:, chosen_idx]
             sn_np = sn_np[:, chosen_idx]
             label_np = label_np[chosen_idx]
+            s_labels_np = s_labels_np[chosen_idx]
         else:
             # print(f"In else: pc_np.shape: {pc_np.shape}")
             chosen_idx = np.random.choice(pc_np.shape[1], self.opt.input_pc_num-pc_np.shape[1], replace=True)
@@ -250,9 +286,12 @@ class ArchesLoader(data.Dataset):
             # print(f"The type of sn_np is {type(sn_np)}")
             sn_np_redundent = sn_np[:, chosen_idx]
             label_np_redundent = label_np[chosen_idx]
+            s_labels_np_redundent = s_labels_np[chosen_idx]
             pc_np = np.concatenate((pc_np, pc_np_redundent), axis=1) # Ux3 concat Vx3 -> Nx3
             sn_np = np.concatenate((sn_np, sn_np_redundent), axis=1)
             label_np = np.concatenate((label_np, label_np_redundent), axis=0)
+            s_labels_np = np.concatenate((s_labels_np, s_labels_np_redundent), axis=0)
+            
 
         # print(f"Shape just before augmentation is {pc_np.shape}")
         # print(f"shape of label_np is {label_np.shape} (should be N == 8192)")
@@ -302,6 +341,7 @@ class ArchesLoader(data.Dataset):
 
             # print("Scaling point cloud")
             # Random scale
+            np.random.seed(42)
             scale = np.random.uniform(low=0.8, high=1.2)
             pc_np = pc_np * scale
             if self.opt.surface_normal:
@@ -318,6 +358,12 @@ class ArchesLoader(data.Dataset):
         pc = torch.from_numpy(pc_np.astype(np.float32))  # 3xN
         sn = torch.from_numpy(sn_np.astype(np.float32))  # 3xN
         labels = torch.from_numpy(label_np.astype(np.int64))  # N
+        # center = torch.from_numpy(center_np.astype(np.float32)) # 3
+        box_idx = torch.as_tensor(index)
+        
+        # Convert string label to index in all_supervoxels array
+        s_labels = torch.from_numpy(np.asarray([self.all_supervoxels.index(label) for label in s_labels_np]).astype(np.int64)) # N
+        # s_labels = torch.from_numpy(np.flatnonzero(np.in1d(self.all_supervoxels, s_labels_np)).astype(np.int64)) # N
 
         # som
         som_node = torch.from_numpy(som_node_np.astype(np.float32))  # 3xnode_num
@@ -337,7 +383,7 @@ class ArchesLoader(data.Dataset):
 
         # print(f"Final shape of pc is {pc.shape}. Index is {augmentation_idx}")
 
-        return pc, sn, labels, som_node, som_knn_I
+        return pc, sn, labels, s_labels, som_node, som_knn_I, box_idx
 
 
 

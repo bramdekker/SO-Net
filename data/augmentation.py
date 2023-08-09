@@ -35,6 +35,7 @@ def random_gaussian_noise(data, mean, std, truncate_val):
     """
     # noise = np.random.normal(mean, std, len(data))
     # randn returns floating-point samples from the Gaussian distribution.
+    np.random.seed(42)
     noise = np.clip(std * np.random.randn(data.shape[0], data.shape[1]) + mean, -truncate_val, truncate_val)
     return data + noise
 
