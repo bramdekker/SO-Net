@@ -534,8 +534,8 @@ def al_round(model, trainset, labelled_superpoints, budget, opt, pseudo_labellin
     assert(sum([x.budget for x in superpoint_list]) == 425984)
 
     # Determine best supervoxels. (Also exclude the pseudolabelled superpoints!)
-    # most_informative_superpoints = random_selection(superpoint_list, budget)
-    most_informative_superpoints = informativeness_selection(superpoint_list, budget, math.ceil(len(dataloader.dataset) * 1.25)) #unlabelled_supervoxel_counts, budget)
+    most_informative_superpoints = random_selection(superpoint_list, budget)
+    # most_informative_superpoints = informativeness_selection(superpoint_list, budget, math.ceil(len(dataloader.dataset) * 1.25)) #unlabelled_supervoxel_counts, budget)
     
     # s_dict = {s_label:  for s_label in most_informative_superpoints}
     
