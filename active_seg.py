@@ -551,6 +551,7 @@ GAMMA = 0.75
 # TODO: use dict with maps superpoint label to class label??
 if __name__=='__main__':
     dataset = ArchesLoader(opt.dataroot, 'all', opt)
+    print(f"The length of the dataset is {len(dataset)}")
     # all_supervoxel_labels = get_all_supervoxels(dataset.dataset)
     
     labelled_superpoints = {}
