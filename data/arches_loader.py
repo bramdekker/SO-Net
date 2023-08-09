@@ -196,6 +196,7 @@ class ArchesLoader(data.Dataset):
                 s_labels_np = data['s_labels']
                 all_supervoxel_labels.extend(np.unique(s_labels_np))
             
+        all_supervoxel_labels.sort()
         return all_supervoxel_labels
         
     def add_labelled_supervoxel(self, s_label):
